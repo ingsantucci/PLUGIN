@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio Funzioni</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<style>
+:root{
+  --fs:17px;
+  --bg:#eef1f6; --panel:#ffffff; --ink:#111827; --muted:#4b5563; --line:#d1d5db;
+  --acc:#1d4ed8; --acc-soft:#dbe6ff; --green:#0a7d34; --red:#c62828; --orange:#c2410c; --purple:#7e22ce;
+  --head:#0f172a;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 var(--fs)/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+header{background:var(--head);color:#fff;display:flex;align-items:center;gap:10px;padding:6px 10px;flex-wrap:wrap}
+header h1{font-size:1.05em;margin:0 6px 0 4px;font-weight:700;white-space:nowrap}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.tabs button{min-height:48px;padding:0 14px;border:0;border-radius:10px;background:transparent;color:#cbd5e1;font:inherit;font-weight:600;cursor:pointer}
+.tabs button:hover{background:#1e293b}
+.tabs button[aria-selected=true]{background:#fff;color:var(--head)}
+.htools{display:flex;gap:6px;flex-wrap:wrap}
+.hbtn{min-height:44px;min-width:44px;padding:0 12px;border:1px solid #334155;border-radius:10px;background:#1e293b;color:#fff;font:inherit;font-size:.9em;cursor:pointer}
+.hbtn[aria-pressed=true]{background:#f59e0b;border-color:#f59e0b;color:#111}
+main{flex:1;display:grid;grid-template-columns:minmax(390px,36%) 1fr;min-height:0}
+#left{overflow-y:auto;padding:12px;background:var(--panel);border-right:1px solid var(--line)}
+#right{position:relative;min-height:0;background:#fff;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.ctools{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:2}
+.ctools button{min-height:44px;min-width:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.95);font:inherit;font-size:.9em;font-weight:600;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.hint{position:absolute;left:10px;bottom:8px;font-size:.75em;color:#6b7280;background:rgba(255,255,255,.85);padding:2px 6px;border-radius:6px;pointer-events:none}
+.card{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;background:#fff}
+.card h3{margin:0 0 8px;font-size:.78em;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.card h4{margin:10px 0 4px;font-size:.9em}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{min-height:44px;min-width:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:#f8fafc;color:var(--ink);font:inherit;cursor:pointer}
+.btn:hover{background:#eef2ff}
+.btn.on,.btn[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn.on .katex,.btn[aria-pressed=true] .katex{color:#fff}
+.btn.tg{display:flex;align-items:center;gap:8px;width:100%;text-align:left;margin:4px 0}
+.btn.tg::before{content:"";width:20px;height:20px;border-radius:5px;border:2px solid currentColor;flex:none}
+.btn.tg[aria-pressed=true]::before{background:#fff;box-shadow:inset 0 0 0 3px var(--acc)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.stp{margin:8px 0}
+.stp .lab{display:flex;justify-content:space-between;gap:8px;font-size:.92em;color:var(--muted)}
+.stp .lab b{color:var(--ink);font-variant-numeric:tabular-nums}
+.stp .ctl{display:grid;grid-template-columns:44px 1fr 44px;gap:8px;align-items:center}
+.stp .ctl button{height:44px;border:1px solid var(--line);border-radius:10px;background:#f1f5f9;font-size:1.35em;font-weight:700;cursor:pointer;color:var(--ink);touch-action:manipulation}
+.stp .ctl button:active{background:var(--acc-soft)}
+input[type=range]{width:100%;height:44px;accent-color:var(--acc);margin:0}
+.formula{font-size:1.2em;text-align:center;padding:4px 0;overflow-x:auto;overflow-y:hidden}
+.kx{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.msg{border-radius:10px;padding:8px 10px;margin:8px 0;border-left:5px solid}
+.msg.info{background:#eff6ff;border-color:var(--acc)}
+.msg.ok{background:#ecfdf3;border-color:var(--green)}
+.msg.warn{background:#fff7ed;border-color:#ea580c}
+.msg.err{background:#fef2f2;border-color:var(--red)}
+.small{font-size:.88em;color:var(--muted)}
+.signtab{border-collapse:collapse;width:100%;font-size:.95em;text-align:center;margin-top:4px}
+.signtab td,.signtab th{padding:4px 3px;border-bottom:1px solid var(--line);font-weight:400}
+.signtab th:first-child,.signtab td:first-child{text-align:left;white-space:nowrap;padding-right:6px}
+.signtab .pt{width:1%;white-space:nowrap;border-left:1px dashed #94a3b8;border-right:1px dashed #94a3b8}
+.sp{color:var(--green);font-weight:800;font-size:1.15em}
+.sn{color:var(--red);font-weight:800;font-size:1.15em}
+.su{color:#9ca3af;background:repeating-linear-gradient(45deg,#fee2e2 0 4px,#fff 4px 8px)}
+table.tt{border-collapse:collapse;width:100%;font-size:.88em}
+table.tt th,table.tt td{border:1px solid var(--line);padding:5px;vertical-align:top;text-align:left}
+table.tt th{background:#f1f5f9}
+.stk{display:grid;grid-template-columns:32px 1fr auto;gap:6px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px;margin:6px 0;background:#fafbff}
+.stk .num{width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85em}
+.stk .ops{display:flex;gap:4px}
+.stk .ops button{min-width:44px;min-height:44px}
+.stk .stp{grid-column:1/-1;margin:0}
+.addgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.addgrid .btn{padding:0 4px}
+.predict-bar{display:none}
+.predicting .predict-bar{display:block}
+.predicting .sol{display:none}
+.revealed-bar{display:none}
+.hidden{display:none!important}
+code.tex{font-family:ui-monospace,Consolas,monospace;font-size:.9em;background:#f3f4f6;padding:1px 4px;border-radius:4px}
+@media (max-width:900px){
+  html,body{height:auto}
+  body{display:block}
+  main{display:flex;flex-direction:column}
+  #right{height:62vh;order:-1}
+  #left{border-right:0}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Laboratorio Funzioni</h1>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <div class="htools">
+    <button class="hbtn" id="bPredict" aria-pressed="false" title="Nasconde grafico e soluzioni finché non si formula una previsione">Prevedi → Verifica</button>
+    <button class="hbtn" id="bNot" title="Notazione degli intervalli">]a;b[</button>
+    <button class="hbtn" id="bFm" title="Riduci caratteri">A−</button>
+    <button class="hbtn" id="bFp" title="Ingrandisci caratteri">A+</button>
+    <button class="hbtn" id="bFull" title="Schermo intero">⛶</button>
+  </div>
+</header>
+<main>
+  <section id="left">
+    <div class="predict-bar msg warn" id="predictBar">
+      <b>Modalità previsione.</b> Formula la tua congettura (dominio, segno, forma del grafico...) prima di verificare.
+      <div class="row" style="margin-top:6px"><button class="btn on" id="bReveal">Mostra soluzione</button></div>
+    </div>
+    <div class="revealed-bar msg ok" id="revealedBar">Soluzione visibile. Cambiando un parametro si torna in modalità previsione.</div>
+  </section>
+  <section id="right">
+    <canvas id="cv"></canvas>
+    <div class="ctools">
+      <button id="bReset" title="Ripristina la vista">⟲ Vista</button>
+      <button id="bPng" title="Scarica il grafico in PNG ad alta risoluzione">⤓ PNG</button>
+    </div>
+    <div class="hint">Trascina per spostare · rotellina o due dita per zoom · trascina i cursori arancioni</div>
+  </section>
+</main>
+<script>
+'use strict';
+/* =====================================================================
+   NUCLEO: stato globale, formattazione, insiemi, widget, motore grafico
+   ===================================================================== */
+const APP = { fs: 17, notation: 'ita', predict: false, revealed: false, mod: null };
+const INF = Infinity;
+const $ = (s, r = document) => r.querySelector(s);
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function K(t, d = false) {
+  if (window.katex) {
+    try { return katex.renderToString(t, { displayMode: d, throwOnError: false, strict: 'ignore' }); } catch (e) { /* fallback */ }
+  }
+  return '<code class="tex">' + esc(t) + '</code>';
+}
+/* LaTeX -> testo semplice (didascalie PNG) */
+function plain(t) {
+  let s = t;
+  for (let i = 0; i < 6; i++) {
+    s = s.replace(/\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}/g, '($1)/($2)')
+      .replace(/\\sqrt\[3\]\{([^{}]*)\}/g, '∛($1)')
+      .replace(/\\sqrt\{([^{}]*)\}/g, '√($1)')
+      .replace(/\^\{([^{}]*)\}/g, '^($1)')
+      .replace(/\\log_\{([^{}]*)\}/g, 'log_$1');
+  }
+  return s.replace(/\\left|\\right/g, '').replace(/\\cdot/g, '·').replace(/\\ln/g, 'ln').replace(/\\circ/g, '∘')
+    .replace(/\\operatorname/g, '').replace(/\^2/g, '²').replace(/\^3/g, '³').replace(/\\[,;:! ]/g, ' ')
+    .replace(/\\[a-zA-Z]+/g, '').replace(/[{}]/g, '').replace(/-/g, '−').replace(/\s+/g, ' ')
+    .replace(/\(([\w.,²³]+)\)\//g, '$1/').replace(/\/\(([\w.,²³]+)\)/g, '/$1').trim();
+}
+function h(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  if (props) for (const k in props) {
+    const v = props[k];
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) { if (c == null || c === false) continue; e.append(c.nodeType ? c : document.createTextNode(c)); }
+  return e;
+}
+const range = (a, b, st) => { const o = []; for (let v = a; v <= b + 1e-9; v += st) o.push(Math.round(v * 1e6) / 1e6); return o; };
+const r6 = v => Math.round(v * 1e6) / 1e6;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* ---------- Numeri ---------- */
+function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { const t = a % b; a = b; b = t; } return a; }
+function approxFrac(x, maxD = 12) {
+  if (!isFinite(x)) return null;
+  for (let d = 1; d <= maxD; d++) { const n = Math.round(x * d); if (Math.abs(n / d - x) < 1e-9) return [n, d]; }
+  return null;
+}
+function decStr(x, dig = 3) { let s = String(+x.toFixed(dig)); if (s === '-0') s = '0'; return s; }
+/* numero in LaTeX: intero, frazione, radice, decimale con virgola */
+function N(x) {
+  if (x === INF) return '+\\infty';
+  if (x === -INF) return '-\\infty';
+  if (Math.abs(x) < 1e-12) return '0';
+  const f = approxFrac(x);
+  if (f) { const [n, d] = f; return d === 1 ? String(n) : (n < 0 ? '-' : '') + '\\frac{' + Math.abs(n) + '}{' + d + '}'; }
+  const q = x * x, r = Math.round(q);
+  if (r > 1 && Math.abs(q - r) < 1e-9) return (x < 0 ? '-' : '') + '\\sqrt{' + r + '}';
+  const iq = 1 / (x * x), ir = Math.round(iq);
+  if (ir > 1 && Math.abs(iq - ir) < 1e-9) return (x < 0 ? '-' : '') + '\\frac{1}{\\sqrt{' + ir + '}}';
+  return decStr(x).replace('.', '{,}');
+}
+/* numero in testo semplice (canvas) */
+function T(x) {
+  if (x === INF) return '+∞';
+  if (x === -INF) return '−∞';
+  if (Math.abs(x) < 1e-12) return '0';
+  if (Math.abs(x * 1000 - Math.round(x * 1000)) < 1e-9) return decStr(x, 3).replace('-', '−').replace('.', ',');
+  const f = approxFrac(x, 12);
+  if (f) return (f[0] < 0 ? '−' : '') + Math.abs(f[0]) + (f[1] === 1 ? '' : '/' + f[1]);
+  const q = x * x, r = Math.round(q);
+  if (r > 1 && r < 50 && Math.abs(q - r) < 1e-9) return (x < 0 ? '−' : '') + '√' + r;
+  return decStr(x, 2).replace('-', '−').replace('.', ',');
+}
+const P2 = (x, y) => '(' + T(x) + '; ' + T(y) + ')';
+const DN = v => isFinite(v) && Math.abs(v * 1000 - Math.round(v * 1000)) < 1e-9 ? decStr(v, 3).replace('.', '{,}') : N(v);
+const DEC = v => K(isFinite(v) ? decStr(v, 2).replace('.', '{,}').replace('-', '-') : N(v));
+const PT = (x, y) => '\\left(' + N(x) + ';\\,' + N(y) + '\\right)';
+/* polinomio pulito: terms = [[coeff, 'x^2'], [coeff, 'x'], [coeff, '']] */
+function poly(terms) {
+  let out = '';
+  for (const [c, t] of terms) {
+    if (Math.abs(c) < 1e-12) continue;
+    const neg = c < 0, a = Math.abs(c);
+    const body = t === '' ? N(a) : (Math.abs(a - 1) < 1e-12 ? '' : N(a)) + t;
+    out += out === '' ? (neg ? '-' : '') + body : (neg ? ' - ' : ' + ') + body;
+  }
+  return out || '0';
+}
+/* frazione con segno portato davanti */
+const fr = (c, den) => (c < 0 ? '-' : '') + '\\dfrac{' + N(Math.abs(c)) + '}{' + den + '}';
+function chain(lines, rel = '\\iff') {
+  const L = lines.filter((l, i) => i === 0 || l !== lines[i - 1]);
+  if (L.length === 1) return '<div class="kx">' + K(L[0], true) + '</div>';
+  return '<div class="kx">' + K('\\begin{aligned}' + L.map((l, i) => (i ? rel + '\\;' : '') + '&' + l).join('\\\\[2pt]') + '\\end{aligned}', true) + '</div>';
+}
+
+/* ---------- Insiemi di R come unioni di intervalli ---------- */
+const eq = (a, b) => a === b || Math.abs(a - b) < 1e-9;
+function I(a, b, ca = false, cb = false) { return { a, b, ca: !!ca && isFinite(a), cb: !!cb && isFinite(b) }; }
+const RR = () => [I(-INF, INF)];
+function Rminus(pts) {
+  const s = [...new Set(pts)].sort((a, b) => a - b), out = [];
+  let prev = -INF;
+  for (const p of s) { out.push(I(prev, p)); prev = p; }
+  out.push(I(prev, INF));
+  return out;
+}
+function normalize(S) {
+  const L = S.filter(t => t.a < t.b || (eq(t.a, t.b) && t.ca && t.cb)).map(t => ({ ...t }))
+    .sort((x, y) => (x.a < y.a ? -1 : x.a > y.a ? 1 : 0) || (y.ca - x.ca));
+  const out = [];
+  for (const t of L) {
+    const c = out[out.length - 1];
+    if (c && (t.a < c.b && !eq(t.a, c.b) || (eq(t.a, c.b) && (c.cb || t.ca)))) {
+      if (t.b > c.b && !eq(t.b, c.b)) { c.b = t.b; c.cb = t.cb; } else if (eq(t.b, c.b)) c.cb = c.cb || t.cb;
+    } else out.push(t);
+  }
+  return out;
+}
+function intersect(S, Tt) {
+  const out = [];
+  for (const s of S) for (const t of Tt) {
+    let a, ca, b, cb;
+    if (eq(s.a, t.a)) { a = s.a; ca = s.ca && t.ca; } else if (s.a > t.a) { a = s.a; ca = s.ca; } else { a = t.a; ca = t.ca; }
+    if (eq(s.b, t.b)) { b = s.b; cb = s.cb && t.cb; } else if (s.b < t.b) { b = s.b; cb = s.cb; } else { b = t.b; cb = t.cb; }
+    if (a < b || (eq(a, b) && ca && cb)) out.push(I(a, b, ca, cb));
+  }
+  return normalize(out);
+}
+const union = (...Ss) => normalize(Ss.flat());
+function complement(S) {
+  const L = normalize(S), out = [];
+  let a = -INF, ca = false;
+  for (const t of L) { out.push(I(a, t.a, ca, !t.ca)); a = t.b; ca = !t.cb; }
+  out.push(I(a, INF, ca, false));
+  return normalize(out);
+}
+const mirror = S => normalize(S.map(t => I(-t.b, -t.a, t.cb, t.ca)));
+function setEq(S, Tt) {
+  const A = normalize(S), B = normalize(Tt);
+  return A.length === B.length && A.every((t, i) => eq(t.a, B[i].a) && eq(t.b, B[i].b) && t.ca === B[i].ca && t.cb === B[i].cb);
+}
+function inSet(S, x) {
+  for (const t of S) {
+    if (eq(x, t.a)) { if (t.ca) return true; continue; }
+    if (eq(x, t.b)) { if (t.cb) return true; continue; }
+    if (x > t.a && x < t.b) return true;
+  }
+  return false;
+}
+function endpoints(S) {
+  const o = [];
+  for (const t of S) { if (isFinite(t.a)) o.push(t.a); if (isFinite(t.b)) o.push(t.b); }
+  return [...new Set(o)].sort((a, b) => a - b);
+}
+function nearestIn(S, x) {
+  if (inSet(S, x) || !S.length) return x;
+  let best = x, bd = INF;
+  for (const t of S) for (const [e, c, dir] of [[t.a, t.ca, 1], [t.b, t.cb, -1]]) {
+    if (!isFinite(e)) continue;
+    const cand = c ? e : e + dir * Math.min(0.05, (t.b - t.a) / 4);
+    const d = Math.abs(cand - x);
+    if (d < bd) { bd = d; best = cand; }
+  }
+  return best;
+}
+function ivTex(t) {
+  const it = APP.notation === 'ita';
+  if (eq(t.a, t.b)) return '\\{' + N(t.a) + '\\}';
+  const L = t.ca ? '[' : (it ? ']' : '('), R = t.cb ? ']' : (it ? '[' : ')');
+  return '\\left' + L + N(t.a) + ';\\,' + N(t.b) + '\\right' + R;
+}
+function setTex(S) {
+  if (!S.length) return '\\varnothing';
+  if (S.length === 1 && S[0].a === -INF && S[0].b === INF) return '\\mathbb{R}';
+  return S.map(ivTex).join(' \\cup ');
+}
+function rMinusPoints(S) {
+  if (!S.length || S[0].a !== -INF || S[S.length - 1].b !== INF || S.length < 2) return null;
+  const pts = [];
+  for (let i = 0; i < S.length - 1; i++) {
+    if (!eq(S[i].b, S[i + 1].a) || S[i].cb || S[i + 1].ca) return null;
+    pts.push(S[i].b);
+  }
+  return pts;
+}
+function condTex(t, v = 'x') {
+  if (t.a === -INF && t.b === INF) return v + '\\in\\mathbb{R}';
+  if (eq(t.a, t.b)) return v + ' = ' + N(t.a);
+  if (t.a === -INF) return v + (t.cb ? ' \\le ' : ' < ') + N(t.b);
+  if (t.b === INF) return v + (t.ca ? ' \\ge ' : ' > ') + N(t.a);
+  return N(t.a) + (t.ca ? ' \\le ' : ' < ') + v + (t.cb ? ' \\le ' : ' < ') + N(t.b);
+}
+function setBuilder(S, v = 'x') {
+  if (!S.length) return '\\varnothing';
+  if (S.length === 1 && S[0].a === -INF && S[0].b === INF) return '\\mathbb{R}';
+  const pts = rMinusPoints(S);
+  if (pts) return '\\left\\{' + v + '\\in\\mathbb{R} \\mid ' + pts.map(p => v + '\\neq ' + N(p)).join(' \\,\\land\\, ') + '\\right\\}';
+  return '\\left\\{' + v + '\\in\\mathbb{R} \\mid ' + S.map(t => condTex(t, v)).join(' \\,\\lor\\, ') + '\\right\\}';
+}
+function setAlt(S) {
+  const pts = rMinusPoints(S);
+  return pts ? '\\mathbb{R}\\setminus\\left\\{' + pts.map(N).join(';\\,') + '\\right\\}' : null;
+}
+
+/* ---------- Widget ---------- */
+function stepper(o) {
+  const vals = o.values || range(o.min, o.max, o.step);
+  const fmt = o.fmt || (v => K(N(v)));
+  let cur = o.value;
+  const valid = v => !o.valid || o.valid(v);
+  const lab = h('b');
+  const rng = h('input', { type: 'range', min: 0, max: vals.length - 1, step: 1, 'aria-label': o.aria || 'valore' });
+  const idxOf = v => {
+    let bi = 0, bd = INF;
+    vals.forEach((w, i) => { const d = w === v ? 0 : Math.abs(w - v); if (!isNaN(d) && d < bd) { bd = d; bi = i; } });
+    return bi;
+  };
+  const show = () => { lab.innerHTML = fmt(cur); rng.value = idxOf(cur); };
+  const set = (v, fire = true) => { cur = v; show(); if (fire) o.onChange(v); };
+  const move = dir => {
+    const bs = o.bstep || 1;
+    let cnt = 0, last = null;
+    for (let j = dir > 0 ? 0 : vals.length - 1; j >= 0 && j < vals.length; j += dir) {
+      const w = vals[j];
+      const beyond = dir > 0 ? (w > cur && !eq(w, cur)) : (w < cur && !eq(w, cur));
+      if (beyond && valid(w)) { cnt++; last = w; if (cnt === bs) break; }
+    }
+    if (last !== null) set(last);
+  };
+  rng.addEventListener('input', () => {
+    const i = +rng.value;
+    for (let d = 0; d < vals.length; d++) {
+      for (const j of [i + d, i - d]) if (j >= 0 && j < vals.length && valid(vals[j])) { if (vals[j] !== cur) set(vals[j]); else show(); return; }
+    }
+  });
+  const rep = dir => {
+    let t1 = null, t2 = null;
+    const b = h('button', { type: 'button', 'aria-label': dir > 0 ? 'aumenta' : 'diminuisci' }, dir > 0 ? '+' : '−');
+    const stop = () => { clearTimeout(t1); clearInterval(t2); };
+    b.addEventListener('pointerdown', e => { e.preventDefault(); move(dir); t1 = setTimeout(() => { t2 = setInterval(() => move(dir), 90); }, 450); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
+    b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); move(dir); } });
+    return b;
+  };
+  const el = h('div', { class: 'stp' },
+    h('div', { class: 'lab' }, h('span', { html: o.label }), lab),
+    h('div', { class: 'ctl' }, rep(-1), rng, rep(1)));
+  show();
+  return { el, set: v => set(v, false), get: () => cur };
+}
+function toggle(label, get, onSet) {
+  const b = h('button', { type: 'button', class: 'btn tg', 'aria-pressed': String(!!get()) }, label);
+  b.addEventListener('click', () => { const v = !get(); onSet(v); b.setAttribute('aria-pressed', String(v)); });
+  return b;
+}
+function seg(options, get, onPick) {
+  const box = h('div', { class: 'seg' });
+  const paint = () => box.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.id === String(get())));
+  for (const o of options) {
+    const b = h('button', { type: 'button', class: 'btn', 'data-id': o.id, html: o.html || esc(o.label), title: o.title || '' });
+    b.addEventListener('click', () => { onPick(o.id); paint(); });
+    box.append(b);
+  }
+  paint();
+  box.repaint = paint;
+  return box;
+}
+const card = (title, ...kids) => h('div', { class: 'card' }, title ? h('h3', null, title) : null, ...kids);
+const msg = (kind, html) => `<div class="msg ${kind}">${html}</div>`;
+
+/* ---------- Motore grafico ---------- */
+const CV = { W: 0, H: 0, dpr: 1, pend: false };
+const COL = {
+  axis: '#1f2937', grid: '#dfe4ec', grid2: '#f2f4f8', curve: '#1d4ed8', curve2: '#c2185b', base: '#6b7280',
+  green: '#0a7d34', red: '#d32f2f', orange: '#ea580c', purple: '#7e22ce', ink: '#111827'
+};
+const fpx = (k = 0.78) => Math.round(APP.fs * k);
+function mkMap(v, r) {
+  return {
+    r, s: v.s,
+    X: x => r.x + r.w / 2 + (x - v.cx) * v.s,
+    Y: y => r.y + r.h / 2 - (y - v.cy) * v.s,
+    ix: px => v.cx + (px - r.x - r.w / 2) / v.s,
+    iy: py => v.cy - (py - r.y - r.h / 2) / v.s,
+    xmin: v.cx - r.w / 2 / v.s, xmax: v.cx + r.w / 2 / v.s,
+    ymin: v.cy - r.h / 2 / v.s, ymax: v.cy + r.h / 2 / v.s
+  };
+}
+function mapOf(m, W = CV.W, H = CV.H) {
+  const r = m.rect ? m.rect(W, H) : { x: 0, y: 0, w: W, h: H };
+  if (!m.view.s) m.view.s = m.spanW ? r.w / m.spanW : Math.min(r.w, r.h) / (m.span || 16);
+  return mkMap(m.view, r);
+}
+function niceStep(raw) {
+  const p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+  return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p;
+}
+function axisY(M) { return clamp(M.Y(0), M.r.y + 14, M.r.y + M.r.h - 14); }
+function axisX(M) { return clamp(M.X(0), M.r.x + 14, M.r.x + M.r.w - 14); }
+function clipR(ctx, r) { ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip(); }
+function grid(ctx, M) {
+  const r = M.r;
+  ctx.save(); clipR(ctx, r);
+  ctx.fillStyle = '#fff'; ctx.fillRect(r.x, r.y, r.w, r.h);
+  const st = niceStep(64 / M.s), sub = st / 5;
+  if (sub * M.s >= 9) {
+    ctx.strokeStyle = COL.grid2; ctx.lineWidth = 1; ctx.beginPath();
+    for (let x = Math.ceil(M.xmin / sub) * sub; x <= M.xmax; x += sub) { const p = Math.round(M.X(x)) + .5; ctx.moveTo(p, r.y); ctx.lineTo(p, r.y + r.h); }
+    for (let y = Math.ceil(M.ymin / sub) * sub; y <= M.ymax; y += sub) { const p = Math.round(M.Y(y)) + .5; ctx.moveTo(r.x, p); ctx.lineTo(r.x + r.w, p); }
+    ctx.stroke();
+  }
+  ctx.strokeStyle = COL.grid; ctx.lineWidth = 1; ctx.beginPath();
+  for (let x = Math.ceil(M.xmin / st) * st; x <= M.xmax; x += st) { const p = Math.round(M.X(x)) + .5; ctx.moveTo(p, r.y); ctx.lineTo(p, r.y + r.h); }
+  for (let y = Math.ceil(M.ymin / st) * st; y <= M.ymax; y += st) { const p = Math.round(M.Y(y)) + .5; ctx.moveTo(r.x, p); ctx.lineTo(r.x + r.w, p); }
+  ctx.stroke();
+  const ay = axisY(M), ax = axisX(M);
+  ctx.strokeStyle = COL.axis; ctx.lineWidth = 1.8; ctx.beginPath();
+  ctx.moveTo(r.x, ay); ctx.lineTo(r.x + r.w, ay); ctx.moveTo(ax, r.y); ctx.lineTo(ax, r.y + r.h); ctx.stroke();
+  ctx.fillStyle = COL.axis; ctx.beginPath();
+  ctx.moveTo(r.x + r.w - 2, ay); ctx.lineTo(r.x + r.w - 14, ay - 6); ctx.lineTo(r.x + r.w - 14, ay + 6);
+  ctx.moveTo(ax, r.y + 2); ctx.lineTo(ax - 6, r.y + 14); ctx.lineTo(ax + 6, r.y + 14); ctx.fill();
+  ctx.font = `italic 600 ${fpx(0.95)}px Georgia,serif`;
+  ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText('x', r.x + r.w - 8, ay + 8);
+  ctx.textAlign = 'left'; ctx.fillText('y', ax + 10, r.y + 4);
+  ctx.font = `${fpx(0.72)}px system-ui,sans-serif`; ctx.fillStyle = '#374151';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const lab = v => T(r6(v));
+  for (let x = Math.ceil(M.xmin / st) * st; x <= M.xmax; x += st) {
+    if (Math.abs(x) < st / 2) continue;
+    const p = M.X(x); if (p < r.x + 12 || p > r.x + r.w - 24) continue;
+    ctx.beginPath(); ctx.moveTo(p, ay - 4); ctx.lineTo(p, ay + 4); ctx.strokeStyle = COL.axis; ctx.lineWidth = 1.2; ctx.stroke();
+    ctx.fillText(lab(x), p, ay + 6);
+  }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let y = Math.ceil(M.ymin / st) * st; y <= M.ymax; y += st) {
+    if (Math.abs(y) < st / 2) continue;
+    const p = M.Y(y); if (p < r.y + 20 || p > r.y + r.h - 10) continue;
+    ctx.beginPath(); ctx.moveTo(ax - 4, p); ctx.lineTo(ax + 4, p); ctx.stroke();
+    ctx.fillText(lab(y), ax - 7, p);
+  }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText('O', ax - 5, ay + 5);
+  ctx.restore();
+}
+/* grafico di funzione senza linee spurie: campionamento per pixel + punti speciali + interruzioni note */
+function plotFn(ctx, M, f, o = {}) {
+  const lo = Math.max(M.xmin - 2 / M.s, o.lo ?? -INF), hi = Math.min(M.xmax + 2 / M.s, o.hi ?? INF);
+  if (!(hi >= lo)) return;
+  const dx = 1 / M.s, xs = [];
+  for (let x = lo; x <= hi; x += dx) xs.push(x);
+  xs.push(lo, hi);
+  for (const s of (o.specials || [])) {
+    for (const e of [0, 1e-9, 1e-7, 1e-5, 1e-4, 1e-3, 3e-3, 1e-2, .03, .1]) {
+      for (const x of (e ? [s - e, s + e] : [s])) if (x >= lo && x <= hi) xs.push(x);
+    }
+  }
+  xs.sort((a, b) => a - b);
+  const br = (o.breaks || []).slice().sort((a, b) => a - b);
+  const r = M.r, top = r.y, bot = r.y + r.h, H = r.h;
+  ctx.save(); clipR(ctx, r);
+  ctx.strokeStyle = o.color || COL.curve; ctx.lineWidth = o.w || 3; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.setLineDash(o.dash || []);
+  ctx.beginPath();
+  let pen = false, py0 = 0, prevx = 0;
+  for (const x of xs) {
+    const y = f(x);
+    const ok = isFinite(y) && (!o.dom || o.dom(x));
+    if (!ok) { pen = false; continue; }
+    const px = M.X(x), py = clamp(M.Y(y), top - 4 * H, bot + 4 * H);
+    if (pen) {
+      let brk = false;
+      for (const b of br) if (b > prevx && b < x) { brk = true; break; }
+      if (!brk && ((py0 < top - H && py > bot + H) || (py0 > bot + H && py < top - H))) brk = true;
+      if (brk) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    } else ctx.moveTo(px, py);
+    pen = true; py0 = py; prevx = x;
+  }
+  ctx.stroke(); ctx.restore();
+}
+function dot(ctx, px, py, o = {}) {
+  const r = o.r || 6, c = o.color || COL.curve;
+  ctx.save(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
+  if (o.open) { ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 2.6; ctx.strokeStyle = c; ctx.stroke(); }
+  else { ctx.fillStyle = c; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke(); }
+  ctx.restore();
+}
+function label(ctx, text, px, py, o = {}) {
+  ctx.save();
+  ctx.font = `${o.bold ? '700 ' : '600 '}${o.size || fpx(0.78)}px system-ui,sans-serif`;
+  const w = ctx.measureText(text).width, hh = (o.size || fpx(0.78)) + 6;
+  let x = px + (o.dx ?? 8), y = py + (o.dy ?? -8);
+  if (o.align === 'center') x -= w / 2; else if (o.align === 'right') x -= w + 2 * (o.dx ?? 8);
+  if (o.box !== false) {
+    const R = o.region;
+    if (R) { x = clamp(x, R.x + 4, R.x + R.w - w - 10); y = clamp(y, R.y + hh + 2, R.y + R.h - 4); }
+    ctx.fillStyle = o.bg || 'rgba(255,255,255,.9)';
+    ctx.strokeStyle = o.border || 'rgba(0,0,0,.08)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - 4, y - hh + 2, w + 8, hh, 5) : ctx.rect(x - 4, y - hh + 2, w + 8, hh); ctx.fill(); ctx.stroke();
+  }
+  ctx.fillStyle = o.color || COL.ink; ctx.textBaseline = 'bottom'; ctx.textAlign = 'left';
+  ctx.fillText(text, x, y - 1);
+  ctx.restore();
+}
+function line(ctx, x1, y1, x2, y2, o = {}) {
+  ctx.save(); ctx.strokeStyle = o.color || COL.ink; ctx.lineWidth = o.w || 1.5; ctx.setLineDash(o.dash || []);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore();
+}
+function arrow(ctx, x1, y1, x2, y2, o = {}) {
+  const c = o.color || COL.ink, hd = o.head || 11, a = Math.atan2(y2 - y1, x2 - x1);
+  if (Math.hypot(x2 - x1, y2 - y1) < 2) return;
+  ctx.save(); ctx.strokeStyle = c; ctx.fillStyle = c; ctx.lineWidth = o.w || 2.2; ctx.setLineDash(o.dash || []);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2 - Math.cos(a) * hd * .7, y2 - Math.sin(a) * hd * .7); ctx.stroke();
+  ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - hd * Math.cos(a - .42), y2 - hd * Math.sin(a - .42));
+  ctx.lineTo(x2 - hd * Math.cos(a + .42), y2 - hd * Math.sin(a + .42)); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+/* tratteggio obliquo a 45° allineato globalmente (convenzione lavagna) */
+function hatch(ctx, x1, x2, y1, y2, color, gap = 12, w = 1.4) {
+  if (x2 - x1 < 0.5 || y2 - y1 < 0.5) return;
+  ctx.save(); ctx.beginPath(); ctx.rect(x1, y1, x2 - x1, y2 - y1); ctx.clip();
+  ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath();
+  for (let C = Math.floor((x1 + y1) / gap) * gap; C <= x2 + y2; C += gap) { ctx.moveTo(C - y1, y1); ctx.lineTo(C - y2, y2); }
+  ctx.stroke(); ctx.restore();
+}
+function vAsym(ctx, M, x, o = {}) {
+  const p = M.X(x); if (p < M.r.x || p > M.r.x + M.r.w) return;
+  line(ctx, p, M.r.y, p, M.r.y + M.r.h, { color: o.color || COL.orange, w: 2, dash: [9, 7] });
+  if (o.label !== false) label(ctx, 'x = ' + T(x), p, M.r.y + 30, { color: o.color || COL.orange, dx: 6 });
+}
+function hAsym(ctx, M, y, o = {}) {
+  const p = M.Y(y); if (p < M.r.y || p > M.r.y + M.r.h) return;
+  line(ctx, M.r.x, p, M.r.x + M.r.w, p, { color: o.color || COL.orange, w: 2, dash: [9, 7] });
+  if (o.label !== false) label(ctx, 'y = ' + T(y), M.r.x + 8, p - 4, { color: o.color || COL.orange, dx: 0 });
+}
+/* proiezione del dominio sull'asse x: banda verde, zone vietate rosse, pallini pieni/vuoti */
+function domainBand(ctx, M, S, o = {}) {
+  const ay = o.y ?? axisY(M), r = M.r, x0 = M.xmin - 1, x1 = M.xmax + 1;
+  ctx.save(); clipR(ctx, r);
+  for (const t of complement(S)) {
+    const a = Math.max(t.a, x0), b = Math.min(t.b, x1); if (b < a) continue;
+    ctx.fillStyle = 'rgba(211,47,47,.13)'; ctx.fillRect(M.X(a), ay - 7, M.X(b) - M.X(a), 14);
+    line(ctx, M.X(a), ay, M.X(b), ay, { color: 'rgba(211,47,47,.75)', w: 3, dash: [6, 5] });
+  }
+  for (const t of S) {
+    const a = Math.max(t.a, x0), b = Math.min(t.b, x1); if (b < a) continue;
+    ctx.fillStyle = o.color || 'rgba(10,125,52,.85)';
+    if (eq(t.a, t.b)) continue;
+    ctx.fillRect(M.X(a), ay - (o.th || 4), M.X(b) - M.X(a), 2 * (o.th || 4));
+  }
+  ctx.restore();
+  const drawn = new Set();
+  for (const t of S) for (const [e, c] of [[t.a, t.ca], [t.b, t.cb]]) {
+    if (!isFinite(e) || e < M.xmin || e > M.xmax) continue;
+    const key = r6(e) + (c ? 'c' : 'o'); if (drawn.has(key)) continue; drawn.add(key);
+    dot(ctx, M.X(e), ay, c ? { color: o.dotc || COL.green, r: 6.5 } : { color: COL.red, open: true, r: 6.5 });
+  }
+}
+function handleMark(ctx, px, py, txt, color = COL.orange) {
+  ctx.save();
+  ctx.beginPath(); ctx.arc(px, py, 13, 0, Math.PI * 2); ctx.fillStyle = color; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.font = `700 ${fpx(0.7)}px system-ui`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(txt, px, py + 1);
+  ctx.restore();
+}
+function solShown() { return !APP.predict || APP.revealed; }
+function touched() { if (APP.predict && APP.revealed) { APP.revealed = false; syncPredict(); } }
+function syncPredict() {
+  const L = $('#left');
+  L.classList.toggle('predicting', APP.predict && !APP.revealed);
+  $('#revealedBar').style.display = APP.predict && APP.revealed ? 'block' : 'none';
+  $('#bPredict').setAttribute('aria-pressed', String(APP.predict));
+  redraw();
+}
+function redraw() {
+  if (CV.pend) return;
+  CV.pend = true;
+  requestAnimationFrame(() => { CV.pend = false; paint(CV.ctx, CV.W, CV.H, CV.dpr); });
+}
+function paint(ctx, W, H, sc) {
+  ctx.setTransform(sc, 0, 0, sc, 0, 0);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  if (APP.mod && W > 0) APP.mod.draw(ctx, W, H);
+}
+
+/* =====================================================================
+   MODULO 1 — Dominio, studio del segno, simmetrie
+   ===================================================================== */
+const DOM = '\\operatorname{Dom}(f)';
+const P1 = [
+  {
+    id: 'fratta', tex: '\\frac{c}{x-k}', params: [{ id: 'c', def: 2, nz: true }, { id: 'k', def: 1 }],
+    build(p) {
+      const { c, k } = p, den = poly([[1, 'x'], [-k, '']]);
+      return {
+        tex: fr(c, den), f: x => c / (x - k), dom: Rminus([k]), asym: [k], holes: [], zeros: [],
+        ce: [`${den} \\neq 0`, `x \\neq ${N(k)}`],
+        zeroLines: [`f(x) = 0 \\iff ${c} = 0`], zeroNote: 'Il numeratore è una costante non nulla: l\'equazione è impossibile, la funzione non ha zeri.',
+        factors: [{ tex: String(c), fn: () => c }, { tex: den, fn: x => x - k }],
+        signNote: `Numeratore ${K(String(c))} sempre ${c > 0 ? 'positivo' : 'negativo'}; denominatore ${K(den + ' > 0')} per ${K('x > ' + N(k))}. Si applica la regola dei segni del quoziente.`,
+        sym: eq(k, 0) ? { lines: ['f(-x) = ' + fr(c, '-x'), fr(-c, 'x'), '-f(x)'], verdict: 'dispari' } : null
+      };
+    }
+  },
+  {
+    id: 'poli', tex: '\\frac{1}{x^2-a^2}', params: [{ id: 'a', def: 2, nz: true }],
+    build(p) {
+      const A = Math.abs(p.a), a2 = A * A, den = `x^2 - ${a2}`;
+      return {
+        tex: `\\dfrac{1}{${den}}`, f: x => 1 / (x * x - a2), dom: Rminus([-A, A]), asym: [-A, A], holes: [], zeros: [],
+        ce: [`${den} \\neq 0`, `x^2 \\neq ${a2}`, `x \\neq -${A} \\,\\land\\, x \\neq ${A}`],
+        zeroLines: ['f(x) = 0 \\iff 1 = 0'], zeroNote: 'Equazione impossibile: nessuno zero.',
+        factors: [{ tex: '1', fn: () => 1 }, { tex: den, fn: x => x * x - a2 }],
+        signNote: `Numeratore ${K('1 > 0')}; denominatore ${K(den + ' > 0')} per valori esterni alle radici: ${K(`x < -${A} \\,\\lor\\, x > ${A}`)}.`,
+        sym: { lines: [`f(-x) = \\dfrac{1}{(-x)^2 - ${a2}}`, `\\dfrac{1}{x^2 - ${a2}}`, 'f(x)'], verdict: 'pari' }
+      };
+    }
+  },
+  {
+    id: 'rad', tex: '\\sqrt{kx-a}', params: [{ id: 'k', def: 1, nz: true }, { id: 'a', def: 2 }],
+    build(p) {
+      const { k, a } = p, inner = poly([[k, 'x'], [-a, '']]), x0 = a / k;
+      return {
+        tex: `\\sqrt{${inner}}`, f: x => { const t = k * x - a; return t >= -1e-12 ? Math.sqrt(Math.max(0, t)) : NaN; },
+        dom: k > 0 ? [I(x0, INF, true)] : [I(-INF, x0, false, true)], asym: [], holes: [], zeros: [x0],
+        ce: [`${inner} \\ge 0`, `${poly([[k, 'x']])} \\ge ${N(a)}`, `x ${k > 0 ? '\\ge' : '\\le'} ${N(x0)}`],
+        ceNote: k < 0 ? `Si dividono entrambi i membri per ${K('k = ' + k + ' < 0')}: <b>il verso della disequazione si inverte</b>.` : '',
+        zeroLines: [`\\sqrt{${inner}} = 0`, `${inner} = 0`, `x = ${N(x0)}`],
+        factors: [],
+        signNote: 'La radice quadrata (aritmetica) è sempre ≥ 0 dove esiste: f(x) > 0 in tutto il dominio tranne nello zero; f(x) < 0 mai.'
+      };
+    }
+  },
+  {
+    id: 'log', tex: '\\ln(kx-a)', params: [{ id: 'k', def: 1, nz: true }, { id: 'a', def: 1 }],
+    build(p) {
+      const { k, a } = p, inner = poly([[k, 'x'], [-a, '']]), x0 = a / k, x1 = (a + 1) / k, kx = poly([[k, 'x']]);
+      return {
+        tex: `\\ln\\left(${inner}\\right)`, f: x => { const t = k * x - a; return t > 0 ? Math.log(t) : NaN; },
+        dom: k > 0 ? [I(x0, INF)] : [I(-INF, x0)], asym: [x0], holes: [], zeros: [x1],
+        ce: [`${inner} > 0`, `${kx} > ${N(a)}`, `x ${k > 0 ? '>' : '<'} ${N(x0)}`],
+        ceNote: k < 0 ? `Si divide per ${K('k = ' + k + ' < 0')}: <b>il verso si inverte</b>.` : '',
+        zeroLines: [`\\ln\\left(${inner}\\right) = 0`, `${inner} = 1`, `${kx} = ${N(a + 1)}`, `x = ${N(x1)}`],
+        posLines: [`\\ln\\left(${inner}\\right) > 0`, `${inner} > 1`, `${kx} > ${N(a + 1)}`, `x ${k > 0 ? '>' : '<'} ${N(x1)}`],
+        factors: [],
+        f0Tex: a < 0 ? (a === -1 ? '0' : `\\ln ${-a}`) : null,
+        signNote: `${K('\\ln t > 0 \\iff t > 1')}, mentre ${K('0 < t < 1 \\Rightarrow \\ln t < 0')}. Le soluzioni vanno sempre intersecate con il dominio.`
+      };
+    }
+  },
+  {
+    id: 'irad', tex: '\\frac{1}{\\sqrt{x-a}}', params: [{ id: 'a', def: 1 }],
+    build(p) {
+      const { a } = p, inner = poly([[1, 'x'], [-a, '']]);
+      let f0Tex = null;
+      if (a < 0) { const n = -a, r = Math.round(Math.sqrt(n)); f0Tex = r * r === n ? (r === 1 ? '1' : `\\frac{1}{${r}}`) : `\\frac{1}{\\sqrt{${n}}}`; }
+      return {
+        tex: `\\dfrac{1}{\\sqrt{${inner}}}`, f: x => x - a > 0 ? 1 / Math.sqrt(x - a) : NaN,
+        dom: [I(a, INF)], asym: [a], holes: [], zeros: [], f0Tex,
+        ce: [`\\begin{cases} ${inner} \\ge 0 & \\text{(radicando)}\\\\ \\sqrt{${inner}} \\neq 0 & \\text{(denominatore)} \\end{cases}`, `${inner} > 0`, `x > ${N(a)}`],
+        ceNote: 'Le due condizioni si fondono: il radicando deve essere <b>strettamente</b> positivo.',
+        zeroLines: ['f(x) = 0 \\iff 1 = 0'], zeroNote: 'Equazione impossibile: nessuno zero.',
+        factors: [],
+        signNote: 'Numeratore 1 > 0 e denominatore (radice) > 0 in tutto il dominio: f(x) > 0 per ogni x del dominio.'
+      };
+    }
+  },
+  {
+    id: 'buco', tex: '\\frac{x^2-a^2}{x-a}', params: [{ id: 'a', def: 2 }],
+    build(p) {
+      const { a } = p, a2 = a * a, num = a === 0 ? 'x^2' : `x^2 - ${a2}`, den = poly([[1, 'x'], [-a, '']]), xpa = poly([[1, 'x'], [a, '']]);
+      return {
+        tex: `\\dfrac{${num}}{${den}}`, f: x => eq(x, a) ? NaN : (x * x - a2) / (x - a),
+        dom: Rminus([a]), asym: [], holes: [{ x: a, y: 2 * a }], zeros: a !== 0 ? [-a] : [],
+        ce: [`${den} \\neq 0`, `x \\neq ${N(a)}`],
+        simp: a === 0 ? ['\\dfrac{x^2}{x}', '\\dfrac{x\\cdot x}{x}', 'x \\qquad (x \\neq 0)']
+          : [`\\dfrac{${num}}{${den}}`, `\\dfrac{\\left(${den}\\right)\\left(${xpa}\\right)}{${den}}`, `${xpa} \\qquad (x \\neq ${N(a)})`],
+        simpNote: `Per ${K('x \\neq ' + N(a))} si ha ${K('f(x) = ' + xpa)}, ma ${K(N(a) + ' \\notin ' + DOM)}: il punto ${K(PT(a, 2 * a))} è una <b>singolarità eliminabile</b> (buco) e <b>non appartiene al grafico</b>. La retta ${K('y = ' + xpa)} ha dominio ${K('\\mathbb{R}')}: è un'altra funzione.`,
+        zeroLines: ['f(x) = 0', `${xpa} = 0 \\;\\land\\; x \\neq ${N(a)}`, a !== 0 ? `x = ${N(-a)}` : `x = 0,\\ \\text{ma } 0 \\notin ${DOM}`],
+        zeroNote: a === 0 ? 'Nessuno zero: l\'unico candidato è escluso dal dominio.' : '',
+        factors: [{ tex: xpa, fn: x => x + a }],
+        signNote: `Per ${K('x \\neq ' + N(a))} il segno di f coincide con quello di ${K(xpa)}; nel punto escluso f non esiste.`,
+        sym: a === 0 ? { lines: ['f(-x) = \\dfrac{(-x)^2}{-x}', '-\\dfrac{x^2}{x}', '-f(x)'], verdict: 'dispari' } : null
+      };
+    }
+  },
+  {
+    id: 'sim', label: 'Pari / dispari', params: [{ id: 'a', def: 3 }], variants: true,
+    build(p, v) {
+      const { a } = p, A = Math.abs(a), cA = A === 1 ? '' : String(A);
+      if (v === 'odd') {
+        const tex = poly([[1, 'x^3'], [-a, 'x']]), q = poly([[1, 'x^2'], [-a, '']]);
+        return {
+          tex, f: x => x * x * x - a * x, dom: RR(), asym: [], holes: [], zeros: a > 0 ? [-Math.sqrt(a), 0, Math.sqrt(a)] : [0],
+          ce: ['\\text{polinomio: nessuna condizione}'],
+          zeroLines: [`${tex} = 0`, `x\\left(${q}\\right) = 0`, a > 0 ? `x = 0 \\,\\lor\\, x = \\pm ${N(Math.sqrt(a))}` : a === 0 ? 'x = 0' : `x = 0 \\quad (x^2 = ${a} \\text{ impossibile})`],
+          factors: [{ tex: 'x', fn: x => x }, { tex: q, fn: x => x * x - a }],
+          signNote: 'Scomposizione in fattori e regola dei segni del prodotto.',
+          sym: {
+            lines: a === 0 ? ['f(-x) = (-x)^3', '-x^3', '-f(x)']
+              : [`f(-x) = (-x)^3 ${a > 0 ? '-' : '+'} ${cA}(-x)`, poly([[-1, 'x^3'], [a, 'x']]), `-\\left(${tex}\\right)`, '-f(x)'],
+            verdict: 'dispari'
+          }
+        };
+      }
+      if (v === 'even') {
+        const tex = poly([[1, 'x^2'], [-a, '']]);
+        return {
+          tex, f: x => x * x - a, dom: RR(), asym: [], holes: [], zeros: a > 0 ? [-Math.sqrt(a), Math.sqrt(a)] : a === 0 ? [0] : [],
+          ce: ['\\text{polinomio: nessuna condizione}'],
+          zeroLines: [`${tex} = 0`, `x^2 = ${N(a)}`, a > 0 ? `x = \\pm ${N(Math.sqrt(a))}` : a === 0 ? 'x = 0' : '\\text{impossibile}'],
+          factors: [],
+          signNote: 'Disequazione di secondo grado: il trinomio (con coefficiente di x² positivo) è negativo solo tra le radici.',
+          sym: { lines: [`f(-x) = (-x)^2 ${a === 0 ? '' : (a > 0 ? '- ' + a : '+ ' + (-a))}`, tex, 'f(x)'], verdict: 'pari' }
+        };
+      }
+      const tex = poly([[1, 'x^2'], [a, 'x']]), q = poly([[1, 'x'], [a, '']]);
+      return {
+        tex, f: x => x * x + a * x, dom: RR(), asym: [], holes: [], zeros: a !== 0 ? [Math.min(0, -a), Math.max(0, -a)] : [0],
+        ce: ['\\text{polinomio: nessuna condizione}'],
+        zeroLines: [`${tex} = 0`, a === 0 ? 'x = 0' : `x\\left(${q}\\right) = 0`, a === 0 ? 'x = 0' : `x = 0 \\,\\lor\\, x = ${N(-a)}`],
+        factors: a === 0 ? [] : [{ tex: 'x', fn: x => x }, { tex: q, fn: x => x + a }],
+        signNote: 'Scomposizione in fattori e regola dei segni del prodotto.',
+        sym: a === 0 ? { lines: ['f(-x) = (-x)^2', 'x^2', 'f(x)'], verdict: 'pari' } : {
+          lines: [`f(-x) = (-x)^2 ${a > 0 ? '+' : '-'} ${cA}(-x)`, poly([[1, 'x^2'], [-a, 'x']])],
+          verdict: 'nessuna',
+          extra: `Confronto: ${K('f(x) = ' + tex)} e ${K('-f(x) = ' + poly([[-1, 'x^2'], [-a, 'x']]))}. ` +
+            `Nessuna delle due identità vale per ogni x. Controesempio: ${K(`f(1) = ${1 + a},\\quad f(-1) = ${1 - a}`)}: ` +
+            `${K('f(-1) \\neq f(1)')} e ${K('f(-1) \\neq -f(1)')}.`
+        }
+      };
+    }
+  }
+];
+
+function analyze1(m) {
+  const crit = [...new Set([...endpoints(m.dom), ...m.zeros])].sort((a, b) => a - b);
+  const mid = (a, b) => a === -INF ? (b === INF ? 0 : b - 1) : b === INF ? a + 1 : (a + b) / 2;
+  const sAt = x => {
+    if (!inSet(m.dom, x)) return 'n';
+    const v = m.f(x);
+    if (!isFinite(v)) return 'n';
+    if (Math.abs(v) < 1e-6) return '0';
+    return v > 0 ? '+' : '-';
+  };
+  const els = [];
+  let prev = -INF;
+  for (const c of crit) { els.push({ t: 'iv', a: prev, b: c, m: mid(prev, c) }); els.push({ t: 'pt', x: c }); prev = c; }
+  els.push({ t: 'iv', a: prev, b: INF, m: mid(prev, INF) });
+  for (const e of els) e.s = sAt(e.t === 'iv' ? e.m : e.x);
+  const close = (c, e) => e.t === 'pt' ? I(c.a, e.x, c.ca, true) : I(c.a, e.b, c.ca, false);
+  const run = pred => {
+    const out = [];
+    let cur = null, end = null;
+    for (const e of els) {
+      if (pred(e.s)) { if (!cur) cur = e.t === 'pt' ? { a: e.x, ca: true } : { a: e.a, ca: false }; end = e; }
+      else if (cur) { out.push(close(cur, end)); cur = null; }
+    }
+    if (cur) out.push(close(cur, end));
+    return normalize(out);
+  };
+  return { els, pos: run(s => s === '+'), neg: run(s => s === '-') };
+}
+function signTable(A, factors) {
+  const els = A.els;
+  const cell = s => s === '+' ? '<td class="sp">+</td>' : s === '-' ? '<td class="sn">−</td>' : s === '0' ? '<td>0</td>' : s === 'n' ? '<td class="su">∄</td>' : '<td></td>';
+  let t = '<div class="kx"><table class="signtab"><tr><th></th>' + els.map(e => e.t === 'pt' ? `<th class="pt">${K(N(e.x))}</th>` : '<th></th>').join('') + '</tr>';
+  for (const f of factors) {
+    t += '<tr><td>' + K(f.tex) + '</td>' + els.map(e => {
+      if (e.t === 'iv') { const v = f.fn(e.m); return cell(v > 0 ? '+' : v < 0 ? '-' : '0'); }
+      return `<td class="pt">${Math.abs(f.fn(e.x)) < 1e-9 ? '0' : ''}</td>`;
+    }).join('') + '</tr>';
+  }
+  t += '<tr><td><b>' + K('f(x)') + '</b></td>' + els.map(e => e.t === 'iv' ? cell(e.s) : `<td class="pt">${e.s === '0' ? '0' : e.s === 'n' ? '∄' : ''}</td>`).join('') + '</tr></table></div>';
+  return t;
+}
+
+const M1 = {
+  title: '1 · Dominio, segno, simmetrie', view: { cx: 0, cy: 0, s: 0 }, span: 16,
+  pid: 'fratta', variant: 'odd', p: {}, xc: 2.5, hatchOn: true, symOn: true,
+  preset() { return P1.find(o => o.id === this.pid); },
+  build(root) {
+    const pre = P1.map(o => ({ id: o.id, html: o.tex ? K(o.tex) : esc(o.label) }));
+    this.varBox = h('div', { style: 'margin-top:8px' },
+      seg([{ id: 'odd', html: K('x^3-ax') }, { id: 'even', html: K('x^2-a') }, { id: 'none', html: K('x^2+ax') }],
+        () => this.variant, id => { this.variant = id; touched(); this.update(); }));
+    this.parBox = h('div');
+    this.fBox = h('div', { class: 'formula' });
+    root.append(card('Funzione',
+      seg(pre, () => this.pid, id => { this.pid = id; this.resetParams(); this.buildParams(); touched(); this.update(); }),
+      this.varBox, this.parBox, this.fBox));
+    this.xcS = stepper({ label: 'Cursore ' + K('x'), values: range(-12, 12, 0.1), bstep: 5, fmt: DEC, value: this.xc, onChange: v => { this.xc = v; this.readout(); redraw(); } });
+    this.roBox = h('div', { class: 'sol' });
+    root.append(card('Visualizzazione',
+      toggle('Cancellazione semipiani (convenzione lavagna)', () => this.hatchOn, v => { this.hatchOn = v; redraw(); }),
+      toggle('Punto simmetrico P′(−x; f(−x))', () => this.symOn, v => { this.symOn = v; this.readout(); redraw(); }),
+      this.xcS.el, this.roBox));
+    this.outBox = h('div', { class: 'sol' });
+    root.append(this.outBox);
+    this.resetParams(); this.buildParams();
+  },
+  resetParams() { this.p = {}; for (const q of this.preset().params) this.p[q.id] = q.def; },
+  buildParams() {
+    const pr = this.preset();
+    this.varBox.classList.toggle('hidden', !pr.variants);
+    this.parBox.innerHTML = '';
+    for (const q of pr.params) {
+      this.parBox.append(stepper({
+        label: 'Parametro ' + K(q.id) + (q.nz ? ' ' + K('(' + q.id + '\\neq 0)') : ''), min: -5, max: 5, step: 1, value: this.p[q.id],
+        valid: v => !(q.nz && v === 0), onChange: v => { this.p[q.id] = v; touched(); this.update(); }
+      }).el);
+    }
+  },
+  update() {
+    const m = this.m = this.preset().build(this.p, this.variant);
+    const A = this.A = analyze1(m);
+    this.symDom = setEq(mirror(m.dom), m.dom);
+    this.fBox.innerHTML = K('f(x) = ' + m.tex);
+    let o = '';
+    /* 1. C.E. e dominio */
+    const alt = setAlt(m.dom);
+    o += `<div class="card"><h3>1 · Condizioni di esistenza e dominio</h3>${chain(m.ce)}${m.ceNote ? msg('info', m.ceNote) : ''}
+      <div class="kx">${K(DOM + ' = ' + setBuilder(m.dom), true)}</div>
+      <div class="kx">${K(DOM + ' = ' + setTex(m.dom) + (alt ? ' = ' + alt : ''), true)}</div></div>`;
+    if (m.simp) o += `<div class="card"><h3>Semplificazione e singolarità eliminabile</h3>${chain(m.simp, '=')}${msg('warn', m.simpNote)}</div>`;
+    /* 2. zeri, asse y, segno */
+    o += '<div class="card"><h3>2 · Zeri, asse y, studio del segno</h3><h4>Zeri: f(x) = 0</h4>' + chain(m.zeroLines);
+    if (m.zeroNote) o += `<div class="small">${m.zeroNote}</div>`;
+    const Z = m.zeros.filter(z => inSet(m.dom, z));
+    o += Z.length ? `<div>Zeri: ${Z.map(z => K(PT(z, 0))).join(', ')}</div>` : '<div>Nessuno zero: il grafico non interseca l\'asse x.</div>';
+    o += '<h4>Intersezione con l\'asse y</h4>';
+    if (inSet(m.dom, 0)) {
+      const y0 = m.f(0), t0 = m.f0Tex || N(y0);
+      o += `<div class="kx">${K(`0 \\in ${DOM},\\quad f(0) = ${t0}`)} → punto ${K(`\\left(0;\\,${t0}\\right)`)}</div>`;
+    } else o += msg('info', `${K('0 \\notin ' + DOM)}: il grafico <b>non interseca</b> l'asse y.`);
+    o += '<h4>Segno</h4>';
+    if (m.posLines) o += chain(m.posLines);
+    o += `<div class="small">${m.signNote}</div>`;
+    o += `<div class="kx">${K('f(x) > 0 \\iff x \\in ' + setTex(A.pos), true)}</div>`;
+    o += `<div class="kx">${K('f(x) < 0 \\iff x \\in ' + setTex(A.neg), true)}</div>`;
+    o += '<div class="small">Quadro dei segni (∄ = fuori dal dominio):</div>' + signTable(A, m.factors) + '</div>';
+    /* 3. simmetrie */
+    o += '<div class="card"><h3>3 · Simmetrie</h3>';
+    o += `<div class="small">${K('f \\text{ pari} \\iff f(-x) = f(x)')}, ${K('f \\text{ dispari} \\iff f(-x) = -f(x)')} per ogni ${K('x \\in ' + DOM)}; <b>prerequisito</b>: ${K('x \\in ' + DOM + ' \\Rightarrow -x \\in ' + DOM)}.</div>`;
+    if (!this.symDom) {
+      const cands = [...endpoints(m.dom).flatMap(e => [e + 1, e + 2, e - 1, e - 2, e + .5, e - .5]), ...range(-10, 10, 1)];
+      const w = cands.find(x => inSet(m.dom, x) && !inSet(m.dom, -x));
+      o += msg('err', '<b>Il dominio non è simmetrico rispetto all\'origine: la funzione non può essere né pari né dispari, a prescindere dal calcolo algebrico.</b>' +
+        (w != null ? ` Ad esempio ${K(`x = ${N(w)} \\in ${DOM}`)} ma ${K(`-x = ${N(-w)} \\notin ${DOM}`)}.` : ''));
+    } else {
+      o += msg('ok', 'Il dominio è simmetrico rispetto all\'origine: si può procedere con il calcolo di f(−x).');
+      const s = m.sym;
+      if (s) {
+        o += chain(s.lines, '=');
+        if (s.verdict === 'pari') o += msg('ok', `${K('f(-x) = f(x)\\ \\ \\forall x \\in ' + DOM)}: <b>f è pari</b>, grafico simmetrico rispetto all'asse y.`);
+        else if (s.verdict === 'dispari') o += msg('ok', `${K('f(-x) = -f(x)\\ \\ \\forall x \\in ' + DOM)}: <b>f è dispari</b>, grafico simmetrico rispetto all'origine.`);
+        else o += msg('warn', `<b>f non è né pari né dispari.</b> ${s.extra || ''}`);
+      }
+    }
+    o += '</div>';
+    this.outBox.innerHTML = o;
+    this.readout();
+    redraw();
+  },
+  readout() {
+    const m = this.m, x = this.xc;
+    if (inSet(m.dom, x)) {
+      let s = `<div class="kx">${K(`x = ${DN(x)} \\in ${DOM},\\quad f(${DN(x)}) = ${DN(m.f(x))}`)}</div>`;
+      if (this.symOn) {
+        if (this.symDom) s += `<div class="kx">${K(`P' = \\left(${DN(-x)};\\, f(${DN(-x)})\\right) = \\left(${DN(-x)};\\,${DN(m.f(-x))}\\right)`)}</div>`;
+        else s += '<div class="small">Punto simmetrico non mostrato: il dominio non è simmetrico.</div>';
+      }
+      this.roBox.innerHTML = s;
+    } else this.roBox.innerHTML = msg('err', `${K(`x = ${DN(x)} \\notin ${DOM}`)}: <b>f(x) non definita in ℝ</b>.`);
+  },
+  setX(v) { this.xc = r6(Math.round(v * 10) / 10); this.xcS.set(this.xc); this.readout(); redraw(); },
+  handles() { const M = mapOf(this); return [{ x: M.X(this.xc), y: axisY(M), drag: px => this.setX(M.ix(px)) }]; },
+  tap(px) { this.setX(mapOf(this).ix(px)); },
+  caption() { return 'f(x) = ' + plain(this.m.tex); },
+  draw(ctx, W, H) {
+    const M = mapOf(this, W, H), m = this.m, A = this.A, r = M.r, show = solShown();
+    grid(ctx, M);
+    const ay = axisY(M);
+    if (show) {
+      if (this.hatchOn) {
+        const a0 = clamp(M.Y(0), r.y, r.y + r.h), xs = t => [M.X(Math.max(t.a, M.xmin - 1)), M.X(Math.min(t.b, M.xmax + 1))];
+        for (const t of A.pos) { const [x1, x2] = xs(t); hatch(ctx, x1, x2, a0, r.y + r.h, 'rgba(71,85,105,.5)'); }
+        for (const t of A.neg) { const [x1, x2] = xs(t); hatch(ctx, x1, x2, r.y, a0, 'rgba(71,85,105,.5)'); }
+        for (const t of complement(m.dom)) { if (eq(t.a, t.b)) continue; const [x1, x2] = xs(t); hatch(ctx, x1, x2, r.y, r.y + r.h, 'rgba(211,47,47,.33)'); }
+      }
+      for (const x of m.asym) vAsym(ctx, M, x);
+      plotFn(ctx, M, m.f, { dom: x => inSet(m.dom, x), specials: [...endpoints(m.dom), ...m.zeros], breaks: m.asym });
+      domainBand(ctx, M, m.dom);
+      for (const hl of m.holes) {
+        dot(ctx, M.X(hl.x), M.Y(hl.y), { open: true, r: 8, color: COL.curve });
+        label(ctx, 'buco ' + P2(hl.x, hl.y), M.X(hl.x), M.Y(hl.y), { dx: 12, dy: -10, color: COL.curve, region: r });
+      }
+      for (const z of m.zeros) if (inSet(m.dom, z)) {
+        dot(ctx, M.X(z), ay, { color: COL.purple, r: 7 });
+        label(ctx, P2(z, 0), M.X(z), ay, { dx: 8, dy: -12, color: COL.purple, region: r });
+      }
+      if (inSet(m.dom, 0)) {
+        const y0 = m.f(0);
+        if (isFinite(y0) && Math.abs(y0) > 1e-9) { dot(ctx, M.X(0), M.Y(y0), { color: COL.purple, r: 7 }); label(ctx, P2(0, y0), M.X(0), M.Y(y0), { dx: 10, dy: -8, color: COL.purple, region: r }); }
+      }
+    }
+    const px = M.X(this.xc);
+    line(ctx, px, r.y, px, r.y + r.h, { color: 'rgba(234,88,12,.5)', w: 1.5, dash: [4, 5] });
+    if (show) {
+      if (inSet(m.dom, this.xc)) {
+        const y = m.f(this.xc);
+        line(ctx, px, ay, px, M.Y(y), { color: COL.orange, w: 2 });
+        dot(ctx, px, M.Y(y), { color: COL.orange, r: 8 });
+        label(ctx, 'P' + P2(this.xc, y), px, M.Y(y), { color: COL.orange, region: r, dx: 12 });
+        if (this.symOn && this.symDom) {
+          const xs = -this.xc, ys = m.f(xs);
+          if (isFinite(ys)) {
+            line(ctx, px, M.Y(y), M.X(xs), M.Y(ys), { color: COL.purple, w: 1.5, dash: [5, 5] });
+            dot(ctx, M.X(xs), M.Y(ys), { color: COL.purple, r: 8 });
+            label(ctx, 'P′' + P2(xs, ys), M.X(xs), M.Y(ys), { color: COL.purple, region: r, dx: 12 });
+          }
+        }
+      } else label(ctx, 'x = ' + T(this.xc) + ':  f(x) non definita in ℝ', px, ay - 26, { color: '#fff', bg: COL.red, border: COL.red, region: r, dx: 12, bold: true });
+    }
+    handleMark(ctx, px, ay, 'x');
+  }
+};
+
+/* =====================================================================
+   MODULO 2 — Monotonia, iniettività, funzione inversa
+   ===================================================================== */
+const EXPB = [{ v: 1 / 3, t: '\\tfrac{1}{3}' }, { v: 0.5, t: '\\tfrac{1}{2}' }, { v: 2, t: '2' }, { v: Math.E, t: 'e' }, { v: 3, t: '3' }];
+const IM = '\\operatorname{Im}';
+const CRES = '\\text{strettamente crescente}', DECR = '\\text{strettamente decrescente}';
+const F2 = {
+  lin: {
+    label: 'Lineare', tex: 'mx+q', params: [{ id: 'm', def: 2 }, { id: 'q', def: 1 }],
+    mk({ m, q }) {
+      const tex = poly([[m, 'x'], [q, '']]);
+      return {
+        tex, f: x => m * x + q, nat: RR(), poles: [], splits: [],
+        lim: x => isFinite(x) ? m * x + q : (m === 0 ? q : ((x > 0) === (m > 0) ? INF : -INF)),
+        mono: m > 0 ? K(`f\\ ${CRES} \\text{ in } \\mathbb{R}`) + ' (coefficiente angolare ' + K('m > 0') + ')'
+          : m < 0 ? K(`f\\ ${DECR} \\text{ in } \\mathbb{R}`) + ' (coefficiente angolare ' + K('m < 0') + ')'
+            : 'f è costante: non è strettamente monotona e non è iniettiva.',
+        solve: k => m !== 0 ? [(k - q) / m] : (eq(k, q) ? 'inf' : []),
+        inj: () => m !== 0,
+        inv: () => ({
+          lines: [`y = ${tex}`, `${poly([[m, 'x']])} = ${poly([[1, 'y'], [-q, '']])}`, `x = ${poly([[1 / m, 'y'], [-q / m, '']])}`],
+          tex: v => poly([[1 / m, v], [-q / m, '']]), f: x => (x - q) / m, poles: []
+        })
+      };
+    }
+  },
+  par: {
+    label: 'Parabola', tex: 'ax^2+b', params: [{ id: 'a', def: 1, nz: true, min: -3, max: 3 }, { id: 'b', def: -2 }],
+    mk({ a, b }) {
+      const tex = poly([[a, 'x^2'], [b, '']]);
+      const L = ivTex(I(-INF, 0, false, true)), R = ivTex(I(0, INF, true));
+      return {
+        tex, f: x => a * x * x + b, nat: RR(), poles: [], splits: [0],
+        lim: x => isFinite(x) ? a * x * x + b : (a > 0 ? INF : -INF),
+        mono: a > 0 ? K(`f\\ ${DECR} \\text{ in } ${L},\\quad ${CRES} \\text{ in } ${R}`)
+          : K(`f\\ ${CRES} \\text{ in } ${L},\\quad ${DECR} \\text{ in } ${R}`),
+        monoExtra: 'Non è monotona in ℝ: il vertice (0; ' + T(b) + ') separa i due intervalli di monotonia.',
+        solve: k => { const r = (k - b) / a; if (r < -1e-12) return []; if (Math.abs(r) < 1e-12) return [0]; const s = Math.sqrt(r); return [-s, s]; },
+        inj: D => D.length > 0 && (D.every(t => t.b <= 1e-12) || D.every(t => t.a >= -1e-12)),
+        inv: D => {
+          const sg = D.every(t => t.a >= -1e-12) ? 1 : -1, R2 = poly([[1 / a, 'y'], [-b / a, '']]);
+          return {
+            lines: [`y = ${tex}`, `${poly([[a, 'x^2']])} = ${poly([[1, 'y'], [-b, '']])}`, `x^2 = ${R2}`, `x = \\pm\\sqrt{${R2}}`],
+            note: sg > 0 ? `Poiché ${K('x \\in D \\subseteq ' + R)} (cioè ${K('x \\ge 0')}), si sceglie il segno <b>+</b>: ${K(`x = \\sqrt{${R2}}`)}.`
+              : `Poiché ${K('x \\in D \\subseteq ' + L)} (cioè ${K('x \\le 0')}), si sceglie il segno <b>−</b>: ${K(`x = -\\sqrt{${R2}}`)}.`,
+            tex: v => (sg > 0 ? '' : '-') + `\\sqrt{${poly([[1 / a, v], [-b / a, '']])}}`,
+            f: x => { const t = (x - b) / a; return t >= -1e-12 ? sg * Math.sqrt(Math.max(0, t)) : NaN; }, poles: []
+          };
+        }
+      };
+    }
+  },
+  cub: {
+    label: 'Cubica', tex: 'x^3+b', params: [{ id: 'b', def: 0 }],
+    mk({ b }) {
+      const tex = poly([[1, 'x^3'], [b, '']]), yb = poly([[1, 'y'], [-b, '']]);
+      return {
+        tex, f: x => x * x * x + b, nat: RR(), poles: [], splits: [],
+        lim: x => isFinite(x) ? x * x * x + b : x,
+        mono: K(`f\\ ${CRES} \\text{ in } \\mathbb{R}`),
+        solve: k => [Math.cbrt(k - b)], inj: () => true,
+        inv: () => ({ lines: [`y = ${tex}`, `x^3 = ${yb}`, `x = \\sqrt[3]{${yb}}`], tex: v => `\\sqrt[3]{${poly([[1, v], [-b, '']])}}`, f: x => Math.cbrt(x - b), poles: [] })
+      };
+    }
+  },
+  omo: {
+    label: 'Omografica', tex: '\\frac{ax+b}{cx+d}',
+    params: [{ id: 'a', def: 1 }, { id: 'b', def: 1 }, { id: 'c', def: 1, nz: true }, { id: 'd', def: -2 }],
+    valid: p => p.c !== 0 && p.a * p.d - p.b * p.c !== 0,
+    mk({ a, b, c, d }) {
+      const num = poly([[a, 'x'], [b, '']]), den = poly([[c, 'x'], [d, '']]), tex = `\\dfrac{${num}}{${den}}`;
+      const x0 = -d / c, y0 = a / c, Kc = (b * c - a * d) / (c * c);
+      const f = x => (a * x + b) / (c * x + d);
+      const w = Kc > 0 ? DECR : CRES;
+      const f1 = `\\dfrac{1}{${poly([[1, 'x'], [-x0, '']])}}`, kA = Math.abs(Kc);
+      const kPart = (eq(kA, 1) ? '' : N(kA) + '\\cdot ') + f1;
+      const dec = Math.abs(y0) > 1e-12 ? N(y0) + (Kc > 0 ? ' + ' : ' - ') + kPart : (Kc > 0 ? '' : '-') + kPart;
+      return {
+        tex, f, nat: Rminus([x0]), poles: [x0], splits: [], hasym: y0,
+        lim: (x, s) => !isFinite(x) ? y0 : eq(x, x0) ? ((s > 0) === (Kc > 0) ? INF : -INF) : f(x),
+        mono: K(`f\\ ${w} \\text{ in } ${ivTex(I(-INF, x0))} \\text{ e in } ${ivTex(I(x0, INF))}`) + ' <b>separatamente</b>, ma <b>non</b> in ' + K('\\operatorname{Dom}(f)') + '.',
+        monoExtra: `Scrivendo ${K('f(x) = ' + dec)} si riconosce l'iperbole ${K('y = \\dfrac{k}{x}')} con ${K('k = ' + N(Kc) + (Kc > 0 ? ' > 0' : ' < 0'))}, traslata del vettore ${K('\\vec v = ' + PT(x0, y0))}.`,
+        solve: k => { if (Math.abs(c * k - a) < 1e-12) return []; const x = (b - d * k) / (c * k - a); return eq(x, x0) ? [] : [x]; },
+        inj: () => true,
+        inv: () => {
+          const nY = poly([[-d, 'y'], [b, '']]), dY = poly([[c, 'y'], [-a, '']]);
+          return {
+            lines: [`y = ${tex}`, `y\\left(${den}\\right) = ${num}`, `${poly([[c, 'xy'], [d, 'y']])} = ${num}`, `${poly([[c, 'xy'], [-a, 'x']])} = ${nY}`,
+              `x\\left(${dY}\\right) = ${nY}`, `x = \\dfrac{${nY}}{${dY}}`],
+            note: `Divisione lecita per ${K('y \\neq ' + N(y0))}: il valore ${K('y = ' + N(y0))} (asintoto orizzontale) non appartiene all'immagine.`,
+            tex: v => `\\dfrac{${poly([[-d, v], [b, '']])}}{${poly([[c, v], [-a, '']])}}`, f: x => (b - d * x) / (c * x - a), poles: [y0]
+          };
+        }
+      };
+    }
+  },
+  exp: {
+    label: 'Esponenziale', tex: 'a^x', params: [{ id: 'B', def: 2, values: EXPB.map(o => o.v), fmt: v => K('a = ' + EXPB.find(o => eq(o.v, v)).t) }],
+    mk({ B }) {
+      const bt = EXPB.find(o => eq(o.v, B)).t;
+      const tex = eq(B, Math.E) ? 'e^{x}' : bt.includes('frac') ? `\\left(${bt}\\right)^{x}` : `${bt}^{x}`;
+      const lg = v => eq(B, Math.E) ? `\\ln ${v}` : `\\log_{${bt}} ${v}`;
+      return {
+        tex, f: x => Math.pow(B, x), nat: RR(), poles: [], splits: [], hasym: 0,
+        lim: x => isFinite(x) ? Math.pow(B, x) : ((x > 0) === (B > 1) ? INF : 0),
+        mono: B > 1 ? K(`a > 1:\\ f\\ ${CRES} \\text{ in } \\mathbb{R}`) : K(`0 < a < 1:\\ f\\ ${DECR} \\text{ in } \\mathbb{R}`),
+        solve: k => k > 0 ? [Math.log(k) / Math.log(B)] : [], inj: () => true,
+        inv: () => ({ lines: [`y = ${tex}`, `x = ${lg('y')}`], note: 'Per definizione di logaritmo, con ' + K('y > 0') + '.', tex: v => lg(v), f: x => x > 0 ? Math.log(x) / Math.log(B) : NaN, poles: [] })
+      };
+    }
+  }
+};
+function imageOf(F, D) {
+  const pieces = [];
+  for (const t of D) {
+    const cuts = [t.a, ...F.splits.filter(s => s > t.a && s < t.b), t.b];
+    for (let i = 0; i < cuts.length - 1; i++) {
+      const a = cuts[i], b = cuts[i + 1];
+      const ca = i === 0 ? t.ca : true, cb = i === cuts.length - 2 ? t.cb : true;
+      if (eq(a, b)) { pieces.push(I(F.f(a), F.f(a), true, true)); continue; }
+      const va = ca ? F.f(a) : F.lim(a, 1), vb = cb ? F.f(b) : F.lim(b, -1);
+      if (eq(va, vb)) pieces.push(I(va, va, true, true));
+      else if (va < vb) pieces.push(I(va, vb, ca, cb)); else pieces.push(I(vb, va, cb, ca));
+    }
+  }
+  return normalize(pieces);
+}
+
+const M2 = {
+  title: '2 · Monotonia e inversa', view: { cx: 0, cy: 0, s: 0 }, span: 16,
+  type: 'par', P: { lin: { m: 2, q: 1 }, par: { a: 1, b: -2 }, cub: { b: 0 }, omo: { a: 1, b: 1, c: 1, d: -2 }, exp: { B: 2 } },
+  sub: 'mono', x1: -1, x2: 1.5, k: 2, r: { lo: -INF, hi: INF }, t: 1.5, showInv: true,
+  build(root) {
+    this.parBox = h('div'); this.fBox = h('div', { class: 'formula' });
+    root.append(card('Funzione',
+      seg(Object.entries(F2).map(([id, o]) => ({ id, html: K(o.tex), title: o.label })), () => this.type,
+        id => { this.type = id; this.r = { lo: -INF, hi: INF }; this.buildParams(); this.buildQuick(); this.syncR(); touched(); this.update(); }),
+      this.parBox, this.fBox));
+    root.append(card('Attività',
+      seg([{ id: 'mono', label: 'Monotonia' }, { id: 'inj', label: 'Iniettività e restrizione' }, { id: 'inv', label: 'Funzione inversa' }],
+        () => this.sub, id => { this.sub = id; this.showSub(); this.update(); })));
+    /* monotonia */
+    this.s1 = stepper({ label: K('x_1'), values: range(-10, 10, 0.1), bstep: 5, fmt: DEC, value: this.x1, valid: v => v < this.x2 - 1e-9, onChange: v => { this.setX(1, v); } });
+    this.s2 = stepper({ label: K('x_2'), values: range(-10, 10, 0.1), bstep: 5, fmt: DEC, value: this.x2, valid: v => v > this.x1 + 1e-9, onChange: v => { this.setX(2, v); } });
+    this.monoOut = h('div'); this.monoTh = h('div', { class: 'sol' });
+    this.boxMono = h('div', null, card('Laboratorio di monotonia (definizione a due punti)',
+      h('div', { class: 'small', html: `Definizione: ${K('f')} è strettamente crescente in un intervallo ${K('I')} se ${K('\\forall\\, x_1, x_2 \\in I,\\ x_1 < x_2 \\Rightarrow f(x_1) < f(x_2)')}.` }),
+      this.s1.el, this.s2.el, this.monoOut), this.monoTh);
+    /* restrizione */
+    this.sLo = stepper({ label: 'Restrizione: ' + K('x_{\\min}'), values: [-INF, ...range(-8, 8, 0.5)], fmt: v => K(N(v)), value: this.r.lo, valid: v => v < this.r.hi, onChange: v => { this.r.lo = v; touched(); this.update(); } });
+    this.sHi = stepper({ label: 'Restrizione: ' + K('x_{\\max}'), values: [...range(-8, 8, 0.5), INF], fmt: v => K(N(v)), value: this.r.hi, valid: v => v > this.r.lo, onChange: v => { this.r.hi = v; touched(); this.update(); } });
+    this.quick = h('div', { class: 'row' });
+    this.boxR = card('Restrizione del dominio', this.quick, this.sLo.el, this.sHi.el, h('div', { class: 'small', html: `Il dominio considerato è ${K('D = \\operatorname{Dom}(f) \\cap [x_{\\min};\\, x_{\\max}]')}.` }));
+    /* iniettività */
+    this.sK = stepper({ label: 'Retta orizzontale ' + K('y = k'), values: range(-10, 10, 0.1), bstep: 5, fmt: DEC, value: this.k, onChange: v => { this.k = v; this.update(); } });
+    this.injOut = h('div', { class: 'sol' });
+    this.boxInj = h('div', null, card('Test della retta orizzontale', this.sK.el), this.injOut);
+    /* inversa */
+    this.sT = stepper({ label: 'Punto di verifica ' + K('a \\in D'), values: range(-10, 10, 0.1), bstep: 5, fmt: DEC, value: this.t, valid: v => inSet(this.D, v), onChange: v => { this.t = v; this.update(); } });
+    this.invOut = h('div', { class: 'sol' });
+    this.boxInv = h('div', null, card('Grafico dell\'inversa',
+      toggle('Mostra f⁻¹ e la bisettrice y = x', () => this.showInv, v => { this.showInv = v; redraw(); }), this.sT.el), this.invOut);
+    root.append(this.boxMono, this.boxR, this.boxInj, this.boxInv);
+    this.buildParams(); this.buildQuick(); this.showSub();
+  },
+  buildParams() {
+    const def = F2[this.type], p = this.P[this.type];
+    this.parBox.innerHTML = '';
+    for (const q of def.params) {
+      this.parBox.append(stepper({
+        label: q.values ? 'Base' : 'Parametro ' + K(q.id) + (q.nz ? ' ' + K('(' + q.id + '\\neq 0)') : ''),
+        values: q.values, min: q.min ?? -5, max: q.max ?? 5, step: 1, fmt: q.fmt, value: p[q.id],
+        valid: v => !(q.nz && v === 0) && (!def.valid || def.valid({ ...p, [q.id]: v })),
+        onChange: v => { p[q.id] = v; if (this.type === 'omo') this.buildQuick(); touched(); this.update(); }
+      }).el);
+    }
+    if (this.type === 'omo') this.parBox.append(h('div', { class: 'small', html: `Vincoli: ${K('c \\neq 0')} (altrimenti è una retta) e ${K('ad - bc \\neq 0')} (altrimenti è costante con un buco): i valori non ammessi vengono saltati.` }));
+    if (this.type === 'exp') this.parBox.append(h('div', { class: 'small', html: `Base ${K('a > 0,\\ a \\neq 1')}.` }));
+  },
+  buildQuick() {
+    const F = F2[this.type].mk(this.P[this.type]);
+    this.quick.innerHTML = '';
+    const add = (lab, lo, hi) => this.quick.append(h('button', { class: 'btn', type: 'button', html: lab, onclick: () => { this.r = { lo, hi }; this.syncR(); touched(); this.update(); } }));
+    add('Tutto il dominio', -INF, INF);
+    if (this.type === 'par') { add('Ramo ' + K('x \\ge 0'), 0, INF); add('Ramo ' + K('x \\le 0'), -INF, 0); }
+    if (this.type === 'omo') { const x0 = F.poles[0]; add('Ramo ' + K('x < ' + N(x0)), -INF, x0); add('Ramo ' + K('x > ' + N(x0)), x0, INF); }
+  },
+  syncR() { this.sLo.set(this.r.lo); this.sHi.set(this.r.hi); },
+  showSub() {
+    this.boxMono.classList.toggle('hidden', this.sub !== 'mono');
+    this.boxR.classList.toggle('hidden', this.sub === 'mono');
+    this.boxInj.classList.toggle('hidden', this.sub !== 'inj');
+    this.boxInv.classList.toggle('hidden', this.sub !== 'inv');
+    redraw();
+  },
+  setX(i, v) {
+    v = r6(v);
+    const F = this.F;
+    if (F.poles.some(p => eq(p, v))) v = r6(v + (i === 1 ? -0.05 : 0.05));
+    if (i === 1) { this.x1 = Math.min(v, this.x2 - 0.05); this.s1.set(this.x1); }
+    else { this.x2 = Math.max(v, this.x1 + 0.05); this.s2.set(this.x2); }
+    this.update();
+  },
+  update() {
+    const F = this.F = F2[this.type].mk(this.P[this.type]);
+    this.D = intersect(F.nat, [I(this.r.lo, this.r.hi, true, true)]);
+    this.Im = imageOf(F, this.D);
+    this.isInj = F.inj(this.D);
+    this.inv = this.isInj ? F.inv(this.D) : null;
+    if (!inSet(this.D, this.t)) this.t = r6(nearestIn(this.D, this.t));
+    this.sT.set(this.t);
+    this.fBox.innerHTML = K('f(x) = ' + F.tex);
+    const DT = setTex(this.D), IT = setTex(this.Im);
+    if (this.sub === 'mono') {
+      const { x1, x2 } = this, y1 = F.f(x1), y2 = F.f(x2), dx = x2 - x1, dy = y2 - y1, m = dy / dx;
+      const straddle = F.poles.some(p => x1 < p && p < x2);
+      let o = `<div class="kx">${K(`A = ${PT(x1, y1)},\\quad B = ${PT(x2, y2)}`)}</div>
+        <div class="kx">${K(`m = \\dfrac{f(x_2) - f(x_1)}{x_2 - x_1} = \\dfrac{\\Delta y}{\\Delta x} = \\dfrac{${N(dy)}}{${N(dx)}} \\approx ${N(m)}`, true)}</div>`;
+      if (straddle) {
+        o += msg('err', '<b>Attenzione: i due punti appartengono a componenti connesse diverse del dominio. La monotonia va sempre valutata all\'interno del singolo intervallo continuo, non sull\'unione dei rami.</b>' +
+          ` Esempio classico: per ${K('f(x) = \\frac{1}{x}')} si ha ${K('-1 < 1')} e ${K('f(-1) = -1 < 1 = f(1)')}, eppure ${K('f')} è decrescente in ciascuno dei due rami.`);
+      } else if (Math.abs(dy) < 1e-12) {
+        o += msg('warn', `${K('f(x_1) = f(x_2)')} con ${K('x_1 \\neq x_2')}: questa coppia <b>esclude</b> la stretta monotonia in ogni intervallo che contiene ${K('x_1')} e ${K('x_2')} (e mostra che f non è iniettiva).`);
+      } else {
+        const up = dy > 0;
+        o += msg(up ? 'ok' : 'info', `${K(up ? 'f(x_1) < f(x_2)' : 'f(x_1) > f(x_2)')}: la coppia è <b>coerente</b> con una funzione ${up ? 'crescente' : 'decrescente'} in ${K('[x_1;\\,x_2]')} ed <b>esclude</b> che f sia ${up ? 'decrescente' : 'crescente'} in un intervallo che contiene entrambi i punti.` +
+          '<br><span class="small">Una sola coppia <b>non dimostra</b> la monotonia: la definizione richiede la disuguaglianza per <b>ogni</b> coppia dell\'intervallo. Può solo confutarla.</span>');
+        if (this.type === 'par' && x1 < 0 && x2 > 0) o += msg('warn', 'I due punti sono da parti opposte del vertice: l\'esito dipende dalla coppia scelta. Prova a spostare i cursori: troverai coppie con esiti opposti.');
+      }
+      this.monoOut.innerHTML = o;
+      this.monoTh.innerHTML = `<div class="card"><h3>Monotonia: risultato teorico</h3>${F.mono}${F.monoExtra ? '<div class="small" style="margin-top:6px">' + F.monoExtra + '</div>' : ''}</div>`;
+    }
+    if (this.sub === 'inj') {
+      const S = F.solve(this.k);
+      let o = `<div class="card"><h3>Esito</h3><div class="kx">${K(`D = ${DT},\\qquad f(D) = ${IT}`)}</div>`;
+      if (S === 'inf') o += this.D.length ? msg('err', '<b>Non iniettiva</b>: la retta coincide con il grafico (infinite intersezioni).') : '';
+      else {
+        const xs = S.filter(x => inSet(this.D, x)).sort((a, b) => a - b);
+        this.hits = xs;
+        const kT = N(this.k);
+        if (xs.length >= 2) o += msg('err', `<b>Non iniettiva</b>: stesso valore ${K('y = ' + kT)} per x distinte (${xs.map(x => K('x = ' + N(x))).join(', ')}).`);
+        else if (xs.length === 1) o += msg('ok', `Per ${K('k = ' + kT)} una sola intersezione (${K('x = ' + N(xs[0]))}).`);
+        else o += msg('info', `Nessuna intersezione: ${K(kT + ' \\notin f(D)')}.`);
+      }
+      if (S === 'inf') this.hits = [];
+      o += (this.isInj ? msg('ok', `<b>Teoria:</b> f è iniettiva in ${K('D')}: ogni retta orizzontale incontra il grafico al più una volta.`)
+        : msg('warn', `<b>Teoria:</b> f <b>non</b> è iniettiva in ${K('D')}. Per invertirla bisogna restringere il dominio${this.type === 'par' ? ' (ad esempio a uno dei due rami)' : ''}.`));
+      o += '<div class="small">Il test con un singolo k verifica un caso; l\'iniettività richiede che valga per ogni k.</div></div>';
+      this.injOut.innerHTML = o;
+    }
+    if (this.sub === 'inv') {
+      let o = '';
+      if (!this.isInj || !this.inv) {
+        o = msg('err', `<b>f non è iniettiva in ${K('D = ' + DT)}</b>: non è invertibile. Restringi il dominio con i pulsanti di restrizione.`);
+      } else {
+        const iv = this.inv, t = this.t, ft = F.f(t);
+        o += `<div class="card"><h3>Procedura algebrica</h3>
+          <h4>Passo 1 — si pone y = f(x)</h4><div class="kx">${K(`y = ${F.tex},\\qquad x \\in D = ${DT},\\qquad y \\in ${IM}(f) = ${IT}`)}</div>
+          <h4>Passo 2 — si risolve rispetto a x</h4>${chain(iv.lines)}${iv.note ? '<div class="small">' + iv.note + '</div>' : ''}
+          <h4>Passo 3 — si scambiano i ruoli di x e y</h4><div class="kx">${K(`y = f^{-1}(x) = ${iv.tex('x')}`, true)}</div></div>`;
+        o += `<div class="card"><h3>Dominio e immagine si scambiano</h3>
+          <div class="kx">${K(`\\operatorname{Dom}(f) = D = ${DT} = ${IM}(f^{-1})`)}</div>
+          <div class="kx">${K(`${IM}(f) = ${IT} = \\operatorname{Dom}(f^{-1})`)}</div>
+          <div class="kx">${K(`A = ${PT(t, ft)} \\in \\text{grafico di } f \\iff A' = ${PT(ft, t)} \\in \\text{grafico di } f^{-1}`)}</div>
+          <div class="small">A e A′ sono simmetrici rispetto alla bisettrice ${K('y = x')}: il segmento AA′ è perpendicolare alla bisettrice e ha il punto medio su di essa (i due assi hanno la stessa scala).</div></div>`;
+      }
+      this.invOut.innerHTML = o;
+    }
+    redraw();
+  },
+  handles() {
+    const M = mapOf(this), F = this.F;
+    if (this.sub === 'mono') return [
+      { x: M.X(this.x1), y: axisY(M), drag: px => this.setX(1, Math.round(M.ix(px) * 10) / 10) },
+      { x: M.X(this.x2), y: axisY(M), drag: px => this.setX(2, Math.round(M.ix(px) * 10) / 10) }];
+    if (this.sub === 'inj') return [{ x: axisX(M), y: M.Y(this.k), drag: (px, py) => { this.k = r6(Math.round(M.iy(py) * 10) / 10); this.sK.set(this.k); this.update(); } }];
+    if (this.sub === 'inv' && this.isInj) return [{ x: M.X(this.t), y: M.Y(F.f(this.t)), drag: px => { this.t = r6(nearestIn(this.D, Math.round(M.ix(px) * 10) / 10)); this.update(); } }];
+    return [];
+  },
+  tap(px, py) {
+    const M = mapOf(this);
+    if (this.sub === 'inv' && this.isInj) { this.t = r6(nearestIn(this.D, Math.round(M.ix(px) * 10) / 10)); this.update(); }
+    else if (this.sub === 'inj') { this.k = r6(Math.round(M.iy(py) * 10) / 10); this.sK.set(this.k); this.update(); }
+  },
+  caption() { return 'f(x) = ' + plain(this.F.tex) + (this.sub === 'inv' && this.inv ? '   ·   f⁻¹(x) = ' + plain(this.inv.tex('x')) : ''); },
+  restrictedCurve(ctx, M, color = COL.curve) {
+    const F = this.F;
+    for (const t of this.D) plotFn(ctx, M, F.f, { lo: t.a, hi: t.b, color, w: 3.5, specials: endpoints(this.D), dom: x => inSet(this.D, x) });
+    for (const t of this.D) for (const [e, c] of [[t.a, t.ca], [t.b, t.cb]]) if (c && isFinite(e)) dot(ctx, M.X(e), M.Y(F.f(e)), { color, r: 6 });
+  },
+  draw(ctx, W, H) {
+    const M = mapOf(this, W, H), F = this.F, r = M.r;
+    grid(ctx, M);
+    for (const p of F.poles) vAsym(ctx, M, p);
+    if (F.hasym != null && this.type === 'omo') hAsym(ctx, M, F.hasym);
+    const ay = axisY(M);
+    if (this.sub === 'mono') {
+      plotFn(ctx, M, F.f, { breaks: F.poles });
+      const { x1, x2 } = this, y1 = F.f(x1), y2 = F.f(x2);
+      const X1 = M.X(x1), X2 = M.X(x2), Y1 = M.Y(y1), Y2 = M.Y(y2);
+      const straddle = F.poles.some(p => x1 < p && p < x2);
+      line(ctx, X1, ay, X1, Y1, { color: '#9ca3af', dash: [4, 4] });
+      line(ctx, X2, ay, X2, Y2, { color: '#9ca3af', dash: [4, 4] });
+      if (isFinite(y1) && isFinite(y2)) {
+        line(ctx, X1, Y1, X2, Y1, { color: COL.green, w: 3 });
+        line(ctx, X2, Y1, X2, Y2, { color: COL.orange, w: 3 });
+        line(ctx, X1, Y1, X2, Y2, { color: straddle ? COL.red : COL.purple, w: 3, dash: straddle ? [8, 6] : [] });
+        label(ctx, 'Δx = ' + T(x2 - x1), (X1 + X2) / 2, Y1, { align: 'center', dx: 0, dy: y2 >= y1 ? 24 : -8, color: COL.green, region: r });
+        label(ctx, 'Δy = ' + T(y2 - y1), X2, (Y1 + Y2) / 2, { dx: 10, dy: 8, color: COL.orange, region: r });
+        dot(ctx, X1, Y1, { color: COL.purple, r: 7 }); dot(ctx, X2, Y2, { color: COL.purple, r: 7 });
+        label(ctx, 'A' + P2(x1, y1), X1, Y1, { dx: -10, align: 'right', color: COL.purple, region: r });
+        label(ctx, 'B' + P2(x2, y2), X2, Y2, { dx: 10, color: COL.purple, region: r });
+        if (straddle) label(ctx, 'Punti su rami diversi!', (X1 + X2) / 2, (Y1 + Y2) / 2, { align: 'center', dx: 0, color: '#fff', bg: COL.red, border: COL.red, bold: true, region: r });
+      }
+      handleMark(ctx, X1, ay, 'x₁'); handleMark(ctx, X2, ay, 'x₂');
+      return;
+    }
+    plotFn(ctx, M, F.f, { breaks: F.poles, color: '#9ca3af', w: 2, dash: [7, 6] });
+    domainBand(ctx, M, this.D, { color: 'rgba(29,78,216,.75)', dotc: COL.curve });
+    this.restrictedCurve(ctx, M);
+    if (this.sub === 'inj') {
+      const Y = M.Y(this.k);
+      line(ctx, r.x, Y, r.x + r.w, Y, { color: COL.orange, w: 2.5 });
+      label(ctx, 'y = ' + T(this.k), r.x + r.w - 110, Y - 6, { color: COL.orange, dx: 0, region: r });
+      for (const x of (this.hits || [])) { dot(ctx, M.X(x), Y, { color: COL.red, r: 8 }); label(ctx, P2(x, this.k), M.X(x), Y, { dx: 10, dy: -12, color: COL.red, region: r }); }
+      handleMark(ctx, axisX(M), Y, 'k');
+      return;
+    }
+    if (!this.isInj) { label(ctx, 'f non iniettiva in D: restringi il dominio', r.x + 16, r.y + 70, { dx: 0, color: '#fff', bg: COL.red, border: COL.red, bold: true }); return; }
+    if (this.showInv) {
+      const lo = Math.min(M.xmin, M.ymin), hi = Math.max(M.xmax, M.ymax);
+      line(ctx, M.X(lo), M.Y(lo), M.X(hi), M.Y(hi), { color: '#6b7280', w: 1.8, dash: [10, 7] });
+      label(ctx, 'y = x', M.X(M.ymax - 1.2), M.Y(M.ymax - 1.2), { color: '#4b5563', dx: 10 });
+      const iv = this.inv, Im = this.Im;
+      plotFn(ctx, M, iv.f, { dom: x => inSet(Im, x), specials: endpoints(Im), breaks: iv.poles, color: COL.curve2, w: 3.5 });
+      for (const t of this.D) for (const [e, c] of [[t.a, t.ca], [t.b, t.cb]]) if (c && isFinite(e)) dot(ctx, M.X(this.F.f(e)), M.Y(e), { color: COL.curve2, r: 6 });
+      for (const p of iv.poles) vAsym(ctx, M, p, { color: COL.curve2 });
+      const t = this.t, ft = F.f(t);
+      line(ctx, M.X(t), M.Y(ft), M.X(ft), M.Y(t), { color: COL.green, w: 2, dash: [6, 5] });
+      const mm = (t + ft) / 2; dot(ctx, M.X(mm), M.Y(mm), { color: COL.green, r: 5 });
+      dot(ctx, M.X(ft), M.Y(t), { color: COL.curve2, r: 8 });
+      label(ctx, "A′" + P2(ft, t), M.X(ft), M.Y(t), { color: COL.curve2, dx: 12, region: r });
+      label(ctx, 'f', M.X(M.xmax - 0.8), M.Y(F.f(M.xmax - 0.8)), { color: COL.curve, dx: 6, box: false, size: fpx(1.1), bold: true });
+    }
+    const t = this.t, ft = F.f(t);
+    label(ctx, 'A' + P2(t, ft), M.X(t), M.Y(ft), { color: COL.curve, dx: -12, align: 'right', region: r });
+    handleMark(ctx, M.X(t), M.Y(ft), 'A');
+  }
+};
+
+/* =====================================================================
+   MODULO 3 — Funzione composta (g ∘ f)(x): catalogo chiuso, 3 assi
+   ===================================================================== */
+const INNER = [
+  { id: 'q4', tex: 'x^2-4', f: x => x * x - 4, dom: RR(), zeros: [-2, 2], pos: [I(-INF, -2), I(2, INF)], neg: [I(-2, 2)], poles: [], hint: 'Disequazione di 2° grado con a > 0: il trinomio è positivo per valori esterni alle radici ±2, negativo per valori interni.' },
+  { id: 'q1', tex: 'x^2-1', f: x => x * x - 1, dom: RR(), zeros: [-1, 1], pos: [I(-INF, -1), I(1, INF)], neg: [I(-1, 1)], poles: [], hint: 'Disequazione di 2° grado con a > 0: positivo per valori esterni alle radici ±1.' },
+  { id: 'm4', tex: '4-x^2', f: x => 4 - x * x, dom: RR(), zeros: [-2, 2], pos: [I(-2, 2)], neg: [I(-INF, -2), I(2, INF)], poles: [], hint: 'Con a < 0 il trinomio è positivo per valori interni alle radici ±2.' },
+  { id: 'l2', tex: 'x-2', f: x => x - 2, dom: RR(), zeros: [2], pos: [I(2, INF)], neg: [I(-INF, 2)], poles: [], hint: 'Disequazione di primo grado.' },
+  { id: 'sq', tex: '\\sqrt{x}', f: x => x >= 0 ? Math.sqrt(x) : NaN, dom: [I(0, INF, true)], zeros: [0], pos: [I(0, INF)], neg: [], poles: [], hint: 'La radice quadrata è ≥ 0 dove esiste e vale 0 solo per x = 0.' },
+  { id: 'rc', tex: '\\dfrac{1}{x}', f: x => 1 / x, dom: Rminus([0]), zeros: [], pos: [I(0, INF)], neg: [I(-INF, 0)], poles: [0], hint: 'Il segno di 1/x è quello di x; 1/x non si annulla mai.' },
+  { id: 'ln', tex: '\\ln x', f: x => x > 0 ? Math.log(x) : NaN, dom: [I(0, INF)], zeros: [1], pos: [I(1, INF)], neg: [I(0, 1)], poles: [], hint: 'ln x > 0 per x > 1, ln x < 0 per 0 < x < 1.' },
+  { id: 'x2', tex: 'x^2', f: x => x * x, dom: RR(), zeros: [0], pos: Rminus([0]), neg: [], poles: [], hint: 'Un quadrato è sempre ≥ 0 e vale 0 solo per x = 0.' },
+  { id: 'ex', tex: 'e^{x}', f: Math.exp, dom: RR(), zeros: [], pos: RR(), neg: [], poles: [], hint: 'L\'esponenziale è sempre positiva.' }
+];
+const OUTER = [
+  { id: 'sqrt', tex: '\\sqrt{u}', tpl: s => `\\sqrt{${s}}`, g: u => u >= -1e-12 ? Math.sqrt(Math.max(0, u)) : NaN, dom: [I(0, INF, true)], cond: 'ge0' },
+  { id: 'ln', tex: '\\ln u', tpl: s => `\\ln\\left(${s}\\right)`, g: u => u > 0 ? Math.log(u) : NaN, dom: [I(0, INF)], cond: 'gt0' },
+  { id: 'sq', tex: 'u^2', tpl: s => `\\left(${s}\\right)^2`, g: u => u * u, dom: RR(), cond: 'all' },
+  { id: 'inv', tex: '\\dfrac{1}{u}', tpl: s => `\\dfrac{1}{${s}}`, g: u => u !== 0 ? 1 / u : NaN, dom: Rminus([0]), cond: 'ne0' },
+  { id: 'isq', tex: '\\dfrac{1}{\\sqrt{u}}', tpl: s => `\\dfrac{1}{\\sqrt{${s}}}`, g: u => u > 0 ? 1 / Math.sqrt(u) : NaN, dom: [I(0, INF)], cond: 'gt0' },
+  { id: 'exp', tex: 'e^{u}', tpl: s => `e^{${s}}`, g: Math.exp, dom: RR(), cond: 'all' },
+  { id: 'abs', tex: '\\left|u\\right|', tpl: s => `\\left|${s}\\right|`, g: Math.abs, dom: RR(), cond: 'all' }
+];
+const NOTES3 = {
+  'sq|sq': `Per ${K('x \\ge 0')} si ha ${K('\\left(\\sqrt{x}\\right)^2 = x')}: il grafico è la <b>semiretta</b> ${K('y = x,\\ x \\ge 0')}, non la retta intera. La semplificazione non estende il dominio. Confronta con l'ordine inverso: ${K('(f \\circ g)(x) = \\sqrt{x^2} = \\left|x\\right|')}, definita in ${K('\\mathbb{R}')}: la composizione <b>non è commutativa</b>.`,
+  'x2|sqrt': `Attenzione: ${K('\\sqrt{x^2} = \\left|x\\right|')}, non ${K('x')}.`,
+  'ln|exp': `${K('e^{\\ln x} = x')} vale solo per ${K('x > 0')}: il grafico è la semiretta ${K('y = x,\\ x > 0')}.`,
+  'ex|ln': `${K('\\ln\\left(e^{x}\\right) = x')} per ogni ${K('x \\in \\mathbb{R}')}: qui la composta coincide con l'identità.`,
+  'q4|sqrt': 'Caso critico: per −2 < x < 2 il valore intermedio u = x² − 4 è negativo e la radice non esiste.',
+  'q1|ln': 'Caso critico: il logaritmo richiede u > 0 in senso stretto: anche x = ±1 (dove u = 0) è escluso.'
+};
+const DG = '\\operatorname{Dom}';
+
+const M3 = {
+  title: '3 · Funzione composta', view: { cx: 0, cy: 0, s: 0 }, spanW: 20,
+  fi: 'q4', go: 'sqrt', x: 1, trace: [], sweeping: false,
+  rect(W, H) { const t = Math.round(H * 0.44); return { x: 0, y: t, w: W, h: H - t }; },
+  build(root) {
+    const pre = (a, b, lab) => h('button', { class: 'btn', type: 'button', html: lab, onclick: () => { this.fi = a; this.go = b; this.sF.repaint(); this.sG.repaint(); touched(); this.update(); } });
+    root.append(card('Casi critici guidati', h('div', { class: 'row' },
+      pre('q4', 'sqrt', '1 · ' + K('\\sqrt{x^2-4}')), pre('q1', 'ln', '2 · ' + K('\\ln(x^2-1)')), pre('sq', 'sq', '3 · ' + K('\\left(\\sqrt{x}\\right)^2')))));
+    this.sF = seg(INNER.map(o => ({ id: o.id, html: K(o.tex) })), () => this.fi, id => { this.fi = id; touched(); this.update(); });
+    this.sG = seg(OUTER.map(o => ({ id: o.id, html: K(o.tex) })), () => this.go, id => { this.go = id; touched(); this.update(); });
+    root.append(card('Funzione interna ' + 'f(x)', this.sF), card('Funzione esterna g(u)', this.sG));
+    this.fBox = h('div', { class: 'formula' });
+    root.append(card('Funzione composta', this.fBox));
+    this.sX = stepper({ label: 'Punto ' + K('x') + ' sull\'asse 1', values: range(-10, 10, 0.1), bstep: 5, fmt: DEC, value: this.x, onChange: v => { this.x = v; this.readout(); redraw(); } });
+    this.bSweep = h('button', { class: 'btn', type: 'button', onclick: () => this.sweep() }, '▶ Scansione automatica');
+    this.bClear = h('button', { class: 'btn', type: 'button', onclick: () => { this.trace = []; redraw(); } }, 'Cancella traccia');
+    this.ro = h('div');
+    root.append(card('Flusso x → u = f(x) → y = g(u)', this.sX.el, h('div', { class: 'row' }, this.bSweep, this.bClear), this.ro));
+    this.out = h('div', { class: 'sol' });
+    root.append(this.out);
+  },
+  update() {
+    const F = this.F = INNER.find(o => o.id === this.fi), G = this.G = OUTER.find(o => o.id === this.go);
+    this.trace = [];
+    const condSet = { all: F.dom, ge0: union(F.pos, F.zeros.map(z => I(z, z, true, true))), gt0: F.pos, ne0: union(F.pos, F.neg) }[G.cond];
+    this.DC = intersect(F.dom, condSet);
+    const comp = G.tpl(F.tex);
+    this.compTex = comp;
+    this.fBox.innerHTML = K(`f(x) = ${F.tex},\\quad g(u) = ${G.tex}`) + '<br>' + K(`(g \\circ f)(x) = g\\big(f(x)\\big) = ${comp}`);
+    const cT = { all: `${F.tex} \\in \\mathbb{R}`, ge0: `${F.tex} \\ge 0`, gt0: `${F.tex} > 0`, ne0: `${F.tex} \\neq 0` }[G.cond];
+    let o = `<div class="card"><h3>Dominio della funzione composta</h3>
+      <div class="kx">${K(`${DG}(g \\circ f) = \\left\\{x \\in ${DG}(f) \\mid f(x) \\in ${DG}(g)\\right\\}`, true)}</div>
+      <div class="kx">${K(`${DG}(f) = ${setTex(F.dom)},\\qquad ${DG}(g) = ${setTex(G.dom)}`)}</div>
+      <div class="kx">${K(`\\begin{cases} x \\in ${setTex(F.dom)} & (x \\in ${DG}(f))\\\\ ${cT} & (f(x) \\in ${DG}(g)) \\end{cases}`, true)}</div>`;
+    if (G.cond === 'all') o += `<div class="small">${K(DG + '(g) = \\mathbb{R}')}: la seconda condizione è sempre verificata.</div>`;
+    else o += `<div class="kx">${K(`${cT} \\iff x \\in ${setTex(condSet)}`)}</div><div class="small">${F.hint}</div>`;
+    o += `<div class="kx">${K(`${DG}(g \\circ f) = ${setTex(this.DC)}`, true)}</div>`;
+    if (!setEq(this.DC, F.dom)) o += msg('warn', `Il filtro di ${K(DG + '(g)')} ha eliminato una parte di ${K(DG + '(f)')}: ${K(DG + '(g \\circ f) \\subsetneq ' + DG + '(f)')}.`);
+    o += '</div>';
+    const note = NOTES3[this.fi + '|' + this.go];
+    o += `<div class="card"><h3>Nota didattica</h3>${note ? '<div>' + note + '</div>' : ''}<div class="small">Eventuali semplificazioni dell'espressione non modificano il dominio: esso si determina sempre dalla composizione di partenza.</div></div>`;
+    this.out.innerHTML = o;
+    this.readout();
+    redraw();
+  },
+  comp(x) {
+    if (!inSet(this.F.dom, x)) return NaN;
+    const u = this.F.f(x);
+    return inSet(this.G.dom, u) ? this.G.g(u) : NaN;
+  },
+  readout() {
+    const F = this.F, G = this.G, x = this.x;
+    let s = `<div class="kx">${K('x = ' + DN(x))}</div>`;
+    if (!inSet(F.dom, x)) s += msg('err', `${K(`x = ${DN(x)} \\notin ${DG}(f)`)}: il valore intermedio ${K('f(x)')} non esiste, quindi ${K('x \\notin ' + DG + '(g \\circ f)')}.`);
+    else {
+      const u = F.f(x);
+      s += `<div class="kx">${K(`u = f(${DN(x)}) = ${DN(u)}`)}</div>`;
+      if (inSet(G.dom, u)) s += msg('ok', `${K(`u \\in ${DG}(g)`)} → ${K(`y = g(u) = ${DN(G.g(u))}`)}. Quindi ${K('x \\in ' + DG + '(g \\circ f)')}.`);
+      else s += msg('err', `<b>Valore ${K('u = f(x) = ' + DN(u))} escluso: non appartiene a ${K(DG + '(g)')}. Pertanto ${K('x')} non appartiene al dominio della funzione composta ${K('(g \\circ f)(x)')}.</b>`);
+    }
+    this.ro.innerHTML = s;
+  },
+  setX(v) { this.x = r6(Math.round(v * 10) / 10); this.sX.set(this.x); this.readout(); redraw(); },
+  sweep() {
+    if (this.sweeping) { this.sweeping = false; this.bSweep.textContent = '▶ Scansione automatica'; return; }
+    const M = mapOf(this), a = M.xmin + 0.3, b = M.xmax - 0.3, t0 = performance.now(), dur = 7000;
+    this.trace = []; this.sweeping = true; this.bSweep.textContent = '■ Ferma';
+    const step = now => {
+      if (!this.sweeping || APP.mod !== this) { this.sweeping = false; this.bSweep.textContent = '▶ Scansione automatica'; return; }
+      const k = Math.min(1, (now - t0) / dur), x = a + (b - a) * k;
+      this.x = r6(x);
+      const okf = inSet(this.F.dom, x), u = okf ? this.F.f(x) : NaN;
+      this.trace.push({ x, okf, u, okg: okf && inSet(this.G.dom, u) });
+      this.sX.set(Math.round(x * 10) / 10); this.readout(); redraw();
+      if (k < 1) requestAnimationFrame(step); else { this.sweeping = false; this.bSweep.textContent = '▶ Scansione automatica'; }
+    };
+    requestAnimationFrame(step);
+  },
+  handles() { const M = mapOf(this), y1 = M.r.y * 0.2; return [{ x: M.X(this.x), y: y1, drag: px => this.setX(M.ix(px)) }, { x: M.X(this.x), y: axisY(M), drag: px => this.setX(M.ix(px)) }]; },
+  tap(px) { this.setX(mapOf(this).ix(px)); },
+  caption() { return '(g∘f)(x) = ' + plain(this.compTex) + '   ·   Dom = ' + plain(setTex(this.DC)).replace(/\\/g, ''); },
+  draw(ctx, W, H) {
+    const M = mapOf(this, W, H), F = this.F, G = this.G, hT = M.r.y;
+    const MT = mkMap(this.view, { x: 0, y: 0, w: W, h: hT });
+    const ys = [hT * 0.2, hT * 0.53, hT * 0.86];
+    ctx.fillStyle = '#fbfcfe'; ctx.fillRect(0, 0, W, hT);
+    const st = niceStep(64 / M.s);
+    ys.forEach((y, i) => {
+      line(ctx, 0, y, W, y, { color: COL.axis, w: 1.6 });
+      ctx.save(); ctx.font = `${fpx(0.66)}px system-ui`; ctx.fillStyle = '#4b5563'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      for (let x = Math.ceil(M.xmin / st) * st; x <= M.xmax; x += st) {
+        const p = M.X(x); line(ctx, p, y - 4, p, y + 4, { color: COL.axis, w: 1 });
+        ctx.fillText(T(r6(x)), p, y + 6);
+      }
+      ctx.restore();
+      label(ctx, ['Asse 1:  x', 'Asse 2:  u = f(x)', 'Asse 3:  y = g(u)'][i], 8, y - 12, { dx: 0, color: '#111', bold: true, size: fpx(0.72) });
+    });
+    if (solShown()) {
+      domainBand(ctx, MT, F.dom, { y: ys[0] - 12, th: 2, color: 'rgba(29,78,216,.55)', dotc: COL.curve });
+      domainBand(ctx, MT, this.DC, { y: ys[0], th: 4.5 });
+    }
+    domainBand(ctx, MT, G.dom, { y: ys[1], th: 4.5 });
+    label(ctx, 'Dom(g)', W - 90, ys[1] - 12, { dx: 0, color: COL.green, size: fpx(0.66) });
+    if (solShown()) label(ctx, 'Dom(f) (blu)  ·  Dom(g∘f) (verde)', 150, ys[0] - 12, { dx: 0, color: COL.curve, size: fpx(0.66) });
+    for (const t of this.trace) {
+      dot(ctx, M.X(t.x), ys[0], { r: 3, color: t.okg ? COL.green : COL.red });
+      if (t.okf && isFinite(t.u) && t.u > M.xmin && t.u < M.xmax) dot(ctx, M.X(t.u), ys[1], { r: 3, color: t.okg ? COL.green : COL.red });
+    }
+    const x = this.x, X1 = M.X(x);
+    line(ctx, X1, ys[0], X1, H, { color: 'rgba(234,88,12,.35)', w: 1.2, dash: [4, 5] });
+    const cl = v => clamp(M.X(v), 10, W - 10);
+    if (!inSet(F.dom, x)) {
+      label(ctx, 'x ∉ Dom(f)', X1, ys[0] + 30, { color: '#fff', bg: COL.red, border: COL.red, bold: true, align: 'center', dx: 0, region: { x: 0, y: 0, w: W, h: hT } });
+    } else {
+      const u = F.f(x), Xu = cl(u);
+      arrow(ctx, X1, ys[0] + 6, Xu, ys[1] - 8, { color: COL.curve, w: 2.6 });
+      label(ctx, 'f', (X1 + Xu) / 2, (ys[0] + ys[1]) / 2, { box: false, color: COL.curve, bold: true, size: fpx(0.95) });
+      dot(ctx, Xu, ys[1], { color: COL.curve, r: 7 });
+      label(ctx, 'u = ' + T(u) + (M.X(u) !== Xu ? ' (fuori vista)' : ''), Xu, ys[1] - 8, { color: COL.curve, dx: 10, region: { x: 0, y: 0, w: W, h: hT } });
+      if (inSet(G.dom, u)) {
+        const y = G.g(u), Xy = cl(y);
+        arrow(ctx, Xu, ys[1] + 6, Xy, ys[2] - 8, { color: COL.green, w: 2.6 });
+        label(ctx, 'g', (Xu + Xy) / 2, (ys[1] + ys[2]) / 2, { box: false, color: COL.green, bold: true, size: fpx(0.95) });
+        dot(ctx, Xy, ys[2], { color: COL.green, r: 7 });
+        label(ctx, 'y = ' + T(y), Xy, ys[2] - 8, { color: COL.green, dx: 10, region: { x: 0, y: 0, w: W, h: hT } });
+      } else {
+        const yb = ys[1] + (ys[2] - ys[1]) * 0.45;
+        line(ctx, Xu, ys[1] + 6, Xu, yb, { color: COL.red, w: 3 });
+        ctx.save(); ctx.strokeStyle = COL.red; ctx.lineWidth = 3; ctx.beginPath();
+        ctx.moveTo(Xu - 12, yb + 2); ctx.lineTo(Xu + 12, yb - 6); ctx.moveTo(Xu - 12, yb + 10); ctx.lineTo(Xu + 12, yb + 2); ctx.stroke(); ctx.restore();
+        label(ctx, '✕  u ∉ Dom(g): x escluso da Dom(g∘f)', Xu, yb + 14, { color: '#fff', bg: COL.red, border: COL.red, bold: true, dx: 14, dy: 10, region: { x: 0, y: 0, w: W, h: hT } });
+      }
+    }
+    handleMark(ctx, X1, ys[0], 'x');
+    line(ctx, 0, hT, W, hT, { color: '#94a3b8', w: 2 });
+    /* grafico cartesiano */
+    grid(ctx, M);
+    const r = M.r;
+    plotFn(ctx, M, F.f, { dom: z => inSet(F.dom, z), breaks: F.poles, specials: endpoints(F.dom), color: '#64748b', w: 2, dash: [7, 6] });
+    label(ctx, 'f (tratteggio)', r.x + 10, r.y + 26, { dx: 0, color: '#475569', size: fpx(0.7) });
+    if (solShown()) {
+      const br = [...F.poles, ...(['inv', 'isq', 'ln'].includes(G.id) ? F.zeros : [])];
+      plotFn(ctx, M, z => this.comp(z), { dom: z => inSet(this.DC, z), specials: [...endpoints(this.DC), ...F.zeros], breaks: br, color: COL.curve2, w: 3.5 });
+      domainBand(ctx, M, this.DC);
+      label(ctx, 'g∘f', r.x + 10, r.y + 50, { dx: 0, color: COL.curve2, bold: true, size: fpx(0.8) });
+      const yv = this.comp(x);
+      if (isFinite(yv)) { dot(ctx, M.X(x), M.Y(yv), { color: COL.orange, r: 7 }); label(ctx, P2(x, yv), M.X(x), M.Y(yv), { color: COL.orange, dx: 10, region: r }); }
+    }
+    handleMark(ctx, M.X(x), axisY(M), 'x');
+  }
+};
+
+/* =====================================================================
+   MODULO 4 — Funzioni guida e grafico deduttivo (trasformazioni)
+   g(x) = O( f( I(x) ) ): I = trasformazioni interne (su x), O = esterne (su y)
+   ===================================================================== */
+const pw = n => (A, at) => at ? `${A}^${n}` : `\\left(${A}\\right)^${n}`;
+const B4 = {
+  abs: { tex: '\\left|x\\right|', r: A => `\\left|${A}\\right|`, f: Math.abs, sp: [0], poles: [], hz: null, pts: [[0, 0, 'V'], [1, 1], [-1, 1]] },
+  inv: { tex: '\\dfrac{1}{x}', r: A => `\\dfrac{1}{${A}}`, f: x => 1 / x, sp: [0], poles: [0], hz: 0, pts: [[1, 1, 'P'], [-1, -1, 'Q']] },
+  x2: { tex: 'x^2', r: pw(2), f: x => x * x, sp: [], poles: [], hz: null, pts: [[0, 0, 'V'], [1, 1], [-1, 1]] },
+  sq: { tex: '\\sqrt{x}', r: A => `\\sqrt{${A}}`, f: x => x >= -1e-12 ? Math.sqrt(Math.max(0, x)) : NaN, sp: [0], poles: [], hz: null, pts: [[0, 0, 'O'], [1, 1], [4, 2]] },
+  x3: { tex: 'x^3', r: pw(3), f: x => x * x * x, sp: [], poles: [], hz: null, pts: [[0, 0, 'F'], [1, 1], [-1, -1]] },
+  cb: { tex: '\\sqrt[3]{x}', r: A => `\\sqrt[3]{${A}}`, f: Math.cbrt, sp: [0], poles: [], hz: null, pts: [[0, 0, 'F'], [1, 1], [-1, -1], [8, 2]] }
+};
+const SC4 = [-3, -2, -1, -1 / 2, -1 / 3, 1 / 3, 1 / 2, 2, 3];
+const SH4 = range(-6, 6, 0.5);
+const T4 = {
+  sx: { lab: 'f(x-x_0)', kind: 'in', par: { def: 2, vals: SH4, name: 'x_0' } },
+  sy: { lab: 'f(x)+y_0', kind: 'out', par: { def: 1, vals: SH4, name: 'y_0' } },
+  fx: { lab: '-f(x)', kind: 'out' },
+  fy: { lab: 'f(-x)', kind: 'in' },
+  ay: { lab: '\\left|f(x)\\right|', kind: 'out' },
+  ax: { lab: 'f\\left(\\left|x\\right|\\right)', kind: 'in' },
+  ky: { lab: 'k\\,f(x)', kind: 'out', par: { def: 2, vals: SC4, name: 'k' } },
+  hx: { lab: 'f(hx)', kind: 'in', par: { def: 2, vals: SC4, name: 'h' } }
+};
+const cf = k => eq(k, 1) ? '' : eq(k, -1) ? '-' : N(k);
+function simpOps(ops) {
+  let L = ops.map(o => ({ ...o })), ch = true;
+  while (ch) {
+    ch = false;
+    L = L.filter(o => !(o.k === 'aff' && eq(o.p, 1) && Math.abs(o.q) < 1e-12));
+    for (let i = 0; i < L.length - 1; i++) {
+      const a = L[i], b = L[i + 1];
+      if (a.k === 'aff' && b.k === 'aff') { L.splice(i, 2, { k: 'aff', p: r6(b.p * a.p), q: r6(b.p * a.q + b.q) }); ch = true; break; }
+      if (a.k === 'abs' && b.k === 'abs') { L.splice(i, 1); ch = true; break; }
+      if (a.k === 'aff' && b.k === 'abs' && Math.abs(a.q) < 1e-12) { L.splice(i, 2, { k: 'abs' }, { k: 'aff', p: Math.abs(a.p), q: 0 }); ch = true; break; }
+    }
+  }
+  return L;
+}
+function build4(steps) {
+  let In = [], Out = [];
+  for (const s of steps) {
+    switch (s.t) {
+      case 'sx': In = [{ k: 'aff', p: 1, q: -s.p }, ...In]; break;
+      case 'fy': In = [{ k: 'aff', p: -1, q: 0 }, ...In]; break;
+      case 'hx': In = [{ k: 'aff', p: s.p, q: 0 }, ...In]; break;
+      case 'ax': In = [{ k: 'abs' }, ...In]; break;
+      case 'sy': Out = [...Out, { k: 'aff', p: 1, q: s.p }]; break;
+      case 'fx': Out = [...Out, { k: 'aff', p: -1, q: 0 }]; break;
+      case 'ky': Out = [...Out, { k: 'aff', p: s.p, q: 0 }]; break;
+      case 'ay': Out = [...Out, { k: 'abs' }]; break;
+    }
+  }
+  return { In: simpOps(In), Out: simpOps(Out) };
+}
+const applyOps = (ops, v) => { for (const o of ops) v = o.k === 'abs' ? Math.abs(v) : o.p * v + o.q; return v; };
+function preimage(ops, target) {
+  let S = [target];
+  for (let i = ops.length - 1; i >= 0; i--) {
+    const o = ops[i];
+    S = o.k === 'aff' ? S.map(v => (v - o.q) / o.p) : S.flatMap(v => v > 1e-12 ? [v, -v] : Math.abs(v) <= 1e-12 ? [0] : []);
+  }
+  return S;
+}
+function innerTex(In) {
+  let s = 'x', atom = true;
+  for (const o of In) {
+    if (o.k === 'abs') { s = `\\left|${s}\\right|`; atom = true; }
+    else { s = poly([[o.p, s], [o.q, '']]); atom = false; }
+  }
+  return { s, atom };
+}
+function fullTex(bk, T) {
+  const B = B4[bk], { s: A, atom } = innerTex(T.In);
+  let k0 = 1, c0 = 0, rest = T.Out;
+  if (T.Out.length && T.Out[0].k === 'aff') { k0 = T.Out[0].p; c0 = T.Out[0].q; rest = T.Out.slice(1); }
+  let s;
+  if (bk === 'inv' && !eq(k0, 1)) {
+    const f = approxFrac(Math.abs(k0)) || [Math.abs(k0), 1];
+    const den = f[1] === 1 ? A : `${f[1]}${atom ? A : '\\left(' + A + '\\right)'}`;
+    s = (k0 < 0 ? '-' : '') + `\\dfrac{${f[0]}}{${den}}`;
+  } else s = cf(k0) + (bk === 'abs' && T.In.length && T.In[T.In.length - 1].k === 'abs' ? A : B.r(A, atom));
+  if (Math.abs(c0) > 1e-12) s += (c0 > 0 ? ' + ' : ' - ') + N(Math.abs(c0));
+  for (const o of rest) {
+    if (o.k === 'abs') s = `\\left|${s}\\right|`;
+    else { s = cf(o.p) + s; if (Math.abs(o.q) > 1e-12) s += (o.q > 0 ? ' + ' : ' - ') + N(Math.abs(o.q)); }
+  }
+  return s;
+}
+function opTex(s, g) {
+  switch (s.t) {
+    case 'sx': return `${g}\\left(${poly([[1, 'x'], [-s.p, '']])}\\right)`;
+    case 'sy': return Math.abs(s.p) < 1e-12 ? `${g}(x)` : `${g}(x) ${s.p > 0 ? '+' : '-'} ${N(Math.abs(s.p))}`;
+    case 'fx': return `-${g}(x)`;
+    case 'fy': return `${g}(-x)`;
+    case 'ay': return `\\left|${g}(x)\\right|`;
+    case 'ax': return `${g}\\left(\\left|x\\right|\\right)`;
+    case 'ky': return `${cf(s.p)}\\,${g}(x)`;
+    case 'hx': return `${g}\\left(${poly([[s.p, 'x']])}\\right)`;
+  }
+}
+function desc4(s) {
+  const p = s.p, A = Math.abs(p ?? 0);
+  switch (s.t) {
+    case 'sx': return [A < 1e-12 ? 'nessuno spostamento' : `traslazione orizzontale di ${T(A)} verso ${p > 0 ? 'destra' : 'sinistra'}`, `(x;\\,y) \\mapsto \\left(${poly([[1, 'x'], [p, '']])};\\,y\\right)`];
+    case 'sy': return [A < 1e-12 ? 'nessuno spostamento' : `traslazione verticale di ${T(A)} verso ${p > 0 ? 'l\'alto' : 'il basso'}`, `(x;\\,y) \\mapsto \\left(x;\\,${poly([[1, 'y'], [p, '']])}\\right)`];
+    case 'fx': return ['simmetria rispetto all\'asse x', '(x;\\,y) \\mapsto (x;\\,-y)'];
+    case 'fy': return ['simmetria rispetto all\'asse y', '(x;\\,y) \\mapsto (-x;\\,y)'];
+    case 'ay': return ['la parte di grafico con y < 0 viene ribaltata sopra l\'asse x; la parte con y ≥ 0 resta invariata', '(x;\\,y) \\mapsto \\left(x;\\,\\left|y\\right|\\right)'];
+    case 'ax': return ['si cancella la parte con x < 0 e la si sostituisce con la simmetrica, rispetto all\'asse y, della parte con x ≥ 0: il risultato è una funzione pari', '(x;\\,y) \\mapsto (\\pm x;\\,y) \\text{ per } x \\ge 0'];
+    case 'ky': return [eq(A, 1) ? 'simmetria rispetto all\'asse x' : (A > 1 ? `allungamento verticale di fattore ${T(A)}` : `compressione verticale di fattore ${T(A)}`) + (p < 0 ? ' e simmetria rispetto all\'asse x' : ''), `(x;\\,y) \\mapsto \\left(x;\\,${poly([[p, 'y']])}\\right)`];
+    case 'hx': return [eq(A, 1) ? 'simmetria rispetto all\'asse y' : (A > 1 ? `compressione orizzontale: le ascisse si dividono per ${T(A)}` : `dilatazione orizzontale: le ascisse si moltiplicano per ${T(1 / A)}`) + (p < 0 ? ' e simmetria rispetto all\'asse y' : ''), `(x;\\,y) \\mapsto \\left(${poly([[1 / p, 'x']])};\\,y\\right)`];
+  }
+}
+const INTER_COL = ['#60a5fa', '#f59e0b', '#34d399', '#f472b6', '#a78bfa', '#94a3b8'];
+
+const M4 = {
+  title: '4 · Trasformazioni', view: { cx: 0, cy: 0, s: 0 }, span: 16,
+  base: 'x2', steps: [{ t: 'sx', p: 2 }, { t: 'sy', p: 1 }], inter: false, pts: true, vec: true,
+  build(root) {
+    root.append(card('Funzione guida f(x)', seg(Object.entries(B4).map(([id, o]) => ({ id, html: K(o.tex) })), () => this.base, id => { this.base = id; touched(); this.update(); })));
+    this.stack = h('div');
+    const add = h('div', { class: 'addgrid' });
+    for (const [t, o] of Object.entries(T4)) add.append(h('button', {
+      class: 'btn', type: 'button', html: K(o.lab), title: o.kind === 'in' ? 'trasformazione interna (su x)' : 'trasformazione esterna (su y)',
+      onclick: () => { if (this.steps.length >= 6) return; this.steps.push(o.par ? { t, p: o.par.def } : { t }); touched(); this.renderStack(); this.update(); }
+    }));
+    const q = (lab, st) => h('button', { class: 'btn', type: 'button', html: lab, onclick: () => { this.steps = st.map(s => ({ ...s })); touched(); this.renderStack(); this.update(); } });
+    root.append(card('Trasformazioni (applicate in ordine, dall\'alto)', this.stack,
+      h('div', { class: 'small', style: 'margin:6px 0' }, 'Aggiungi un passo:'), add,
+      h('div', { class: 'small', style: 'margin:8px 0 4px' }, 'Esempi rapidi:'),
+      h('div', { class: 'row' },
+        q('Traslazione ' + K('f(x-x_0)+y_0'), [{ t: 'sx', p: 2 }, { t: 'sy', p: 1 }]),
+        q(K('\\left|g(x)\\right|'), [{ t: 'sx', p: 2 }, { t: 'sy', p: -2 }, { t: 'ay' }]),
+        q(K('g\\left(\\left|x\\right|\\right)'), [{ t: 'sx', p: 2 }, { t: 'sy', p: -2 }, { t: 'ax' }]),
+        q('Trasla poi comprimi', [{ t: 'sx', p: 2 }, { t: 'hx', p: 2 }]),
+        q('Comprimi poi trasla', [{ t: 'hx', p: 2 }, { t: 'sx', p: 2 }]),
+        q('Svuota', [])),
+      h('div', { class: 'msg info small', html: `Ogni passo agisce sul grafico ottenuto al passo precedente. Le trasformazioni <b>interne</b> (su x) sostituiscono x nell'argomento: applicare prima ${K('f(x-2)')} e poi ${K('f(2x)')} dà ${K('f(2x-2)')}, non ${K('f(2(x-2))')}.` })));
+    this.fBox = h('div');
+    root.append(card('Formula risultante', this.fBox));
+    root.append(card('Visualizzazione',
+      toggle('Passaggi intermedi g₁, g₂, …', () => this.inter, v => { this.inter = v; redraw(); }),
+      toggle('Frecce sui punti notevoli', () => this.pts, v => { this.pts = v; redraw(); }),
+      toggle('Vettore traslazione v = (x₀; y₀)', () => this.vec, v => { this.vec = v; redraw(); })));
+    this.tab = h('div', { class: 'sol' });
+    root.append(this.tab);
+    this.renderStack();
+  },
+  renderStack() {
+    this.stack.innerHTML = '';
+    if (!this.steps.length) this.stack.append(h('div', { class: 'small' }, 'Nessuna trasformazione: g(x) = f(x).'));
+    this.steps.forEach((s, i) => {
+      const o = T4[s.t];
+      const mv = (d) => { const j = i + d; if (j < 0 || j >= this.steps.length) return; [this.steps[i], this.steps[j]] = [this.steps[j], this.steps[i]]; touched(); this.renderStack(); this.update(); };
+      const row = h('div', { class: 'stk' },
+        h('span', { class: 'num' }, String(i + 1)),
+        h('span', { html: K(`g_{${i + 1}}(x) = ` + opTex(s, i ? `g_{${i}}` : 'f')) + ' <span class="small">' + (o.kind === 'in' ? 'interna' : 'esterna') + '</span>' }),
+        h('span', { class: 'ops' },
+          h('button', { class: 'btn', type: 'button', title: 'sposta su', onclick: () => mv(-1) }, '↑'),
+          h('button', { class: 'btn', type: 'button', title: 'sposta giù', onclick: () => mv(1) }, '↓'),
+          h('button', { class: 'btn', type: 'button', title: 'elimina', onclick: () => { this.steps.splice(i, 1); touched(); this.renderStack(); this.update(); } }, '✕')));
+      if (o.par) row.append(stepper({
+        label: K(o.par.name), values: o.par.vals, value: s.p,
+        onChange: v => { s.p = v; touched(); row.children[1].innerHTML = K(`g_{${i + 1}}(x) = ` + opTex(s, i ? `g_{${i}}` : 'f')) + ' <span class="small">' + (o.kind === 'in' ? 'interna' : 'esterna') + '</span>'; this.update(); }
+      }).el);
+      this.stack.append(row);
+    });
+  },
+  update() {
+    const B = B4[this.base];
+    this.T = build4(this.steps);
+    this.g = this.mkG(this.T);
+    this.gTex = fullTex(this.base, this.T);
+    let o = `<div class="formula">${K('g(x) = ' + this.gTex)}</div><div class="kx">${K('f(x) = ' + B.tex)}</div>`;
+    if (this.steps.length > 1) o += '<div class="small">Passo per passo:</div>' + this.steps.map((s, i) => `<div class="kx">${K(`g_{${i + 1}}(x) = ` + fullTex(this.base, build4(this.steps.slice(0, i + 1))))}</div>`).join('');
+    this.fBox.innerHTML = o;
+    let t = '<div class="card"><h3>Scheda della trasformazione</h3><div class="kx"><table class="tt"><tr><th>#</th><th>Operazione</th><th>Agisce su</th><th>Effetto geometrico</th><th>Punti</th></tr>';
+    this.steps.forEach((s, i) => {
+      const [d, mp] = desc4(s);
+      t += `<tr><td>${i + 1}</td><td>${K(`g_{${i}} \\to ` + opTex(s, `g_{${i}}`).replace(/g_\{0\}/g, 'f'))}</td><td>${T4[s.t].kind === 'in' ? '<b>x</b> (interna: dentro l\'argomento)' : '<b>y</b> (esterna: sul valore)'}</td><td>${d}</td><td>${K(mp)}</td></tr>`;
+    });
+    t += '</table></div><div class="small" style="margin-top:6px">Ogni riga descrive l\'effetto sul grafico ottenuto alla riga precedente (' + K('g_0 = f') + '). Attenzione: ' + K('\\left|f(x)\\right|') + ' agisce sulle <b>ordinate</b>, ' + K('f\\left(\\left|x\\right|\\right)') + ' sulle <b>ascisse</b>.</div></div>';
+    this.tab.innerHTML = this.steps.length ? t : '';
+    redraw();
+  },
+  mkG(Tt) { const B = B4[this.base]; return x => applyOps(Tt.Out, B.f(applyOps(Tt.In, x))); },
+  handles() { return []; },
+  caption() { return 'f(x) = ' + plain(B4[this.base].tex) + '   →   g(x) = ' + plain(this.gTex); },
+  curve(ctx, M, Tt, g, o) {
+    const B = B4[this.base];
+    const sp = B.sp.flatMap(v => preimage(Tt.In, v)), br = B.poles.flatMap(v => preimage(Tt.In, v));
+    plotFn(ctx, M, g, { specials: sp, breaks: br, ...o });
+  },
+  draw(ctx, W, H) {
+    const M = mapOf(this, W, H), B = B4[this.base], r = M.r, Tt = this.T;
+    grid(ctx, M);
+    for (const p of B.poles) vAsym(ctx, M, p, { color: '#9ca3af', label: false });
+    if (B.hz != null) hAsym(ctx, M, B.hz, { color: '#9ca3af', label: false });
+    plotFn(ctx, M, B.f, { specials: B.sp, breaks: B.poles, color: COL.base, w: 2.5, dash: [8, 6] });
+    label(ctx, 'f(x) = ' + plain(B.tex), r.x + 10, r.y + 26, { dx: 0, color: COL.base });
+    if (!solShown()) return;
+    if (this.inter) this.steps.slice(0, -1).forEach((s, i) => {
+      const Ti = build4(this.steps.slice(0, i + 1));
+      this.curve(ctx, M, Ti, this.mkG(Ti), { color: INTER_COL[i % INTER_COL.length], w: 2.2 });
+    });
+    for (const p of B.poles) for (const x of preimage(Tt.In, p)) vAsym(ctx, M, x, { color: COL.curve2 });
+    if (B.hz != null) hAsym(ctx, M, applyOps(Tt.Out, B.hz), { color: COL.curve2 });
+    this.curve(ctx, M, Tt, this.g, { color: COL.curve2, w: 3.8 });
+    label(ctx, 'g(x) = ' + plain(this.gTex), r.x + 10, r.y + 52, { dx: 0, color: COL.curve2, bold: true });
+    if (this.pts) for (const [bx, by, tag] of B.pts) {
+      const y2 = applyOps(Tt.Out, by);
+      dot(ctx, M.X(bx), M.Y(by), { color: COL.base, r: 5 });
+      for (const x of preimage(Tt.In, bx)) {
+        if (!isFinite(x)) continue;
+        arrow(ctx, M.X(bx), M.Y(by), M.X(x), M.Y(y2), { color: COL.purple, w: 1.8, dash: [5, 4], head: 9 });
+        dot(ctx, M.X(x), M.Y(y2), { color: COL.curve2, r: 6 });
+        if (tag) label(ctx, tag + '′' + P2(x, y2), M.X(x), M.Y(y2), { color: COL.curve2, dx: 10, region: r });
+      }
+    }
+    const onlyT = this.steps.length && this.steps.every(s => s.t === 'sx' || s.t === 'sy');
+    if (this.vec && onlyT) {
+      const x0 = this.steps.filter(s => s.t === 'sx').reduce((a, s) => a + s.p, 0), y0 = this.steps.filter(s => s.t === 'sy').reduce((a, s) => a + s.p, 0);
+      arrow(ctx, M.X(0), M.Y(0), M.X(x0), M.Y(y0), { color: COL.green, w: 4.5, head: 16 });
+      label(ctx, 'v = ' + P2(x0, y0), M.X(x0 / 2), M.Y(y0 / 2), { color: COL.green, bold: true, dx: 14, dy: 26, region: r });
+    }
+  }
+};
+
+/* =====================================================================
+   AVVIO: schede, interazione sul canvas, esportazione PNG
+   ===================================================================== */
+const MODS = [M1, M2, M3, M4];
+function selectTab(i) {
+  const m = MODS[i];
+  if (!m.root) { m.root = h('div'); $('#left').append(m.root); m.build(m.root); m.update(); }
+  MODS.forEach(o => o.root && o.root.classList.toggle('hidden', o !== m));
+  document.querySelectorAll('#tabs button').forEach((b, j) => b.setAttribute('aria-selected', String(i === j)));
+  APP.mod = m; APP.revealed = false; syncPredict();
+  $('#left').scrollTop = 0;
+  redraw();
+}
+function resize() {
+  const r = $('#right').getBoundingClientRect();
+  CV.W = r.width; CV.H = r.height; CV.dpr = window.devicePixelRatio || 1;
+  CV.c.width = Math.max(1, Math.round(CV.W * CV.dpr)); CV.c.height = Math.max(1, Math.round(CV.H * CV.dpr));
+  redraw();
+}
+function zoomAt(px, py, f) {
+  const m = APP.mod, M = mapOf(m), mx = M.ix(px), my = M.iy(py), r = M.r;
+  m.view.s = clamp(m.view.s * f, 3, 3000);
+  m.view.cx = mx - (px - r.x - r.w / 2) / m.view.s;
+  m.view.cy = my + (py - r.y - r.h / 2) / m.view.s;
+  redraw();
+}
+function initPointer() {
+  const c = CV.c, ptrs = new Map();
+  let drag = null;
+  const pos = e => { const b = c.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
+  c.addEventListener('pointerdown', e => {
+    c.setPointerCapture(e.pointerId);
+    const p = pos(e); ptrs.set(e.pointerId, p);
+    if (ptrs.size === 1) {
+      let best = null, bd = 28;
+      for (const hd of (APP.mod.handles ? APP.mod.handles() : [])) { const d = Math.hypot(hd.x - p.x, hd.y - p.y); if (d < bd) { bd = d; best = hd; } }
+      drag = best ? { kind: 'h', h: best, start: p, moved: 0 } : { kind: 'pan', start: p, last: p, moved: 0 };
+    } else if (ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()];
+      drag = { kind: 'pinch', d0: Math.hypot(a.x - b.x, a.y - b.y) };
+    }
+  });
+  c.addEventListener('pointermove', e => {
+    const p = pos(e);
+    if (!ptrs.has(e.pointerId)) {
+      const near = (APP.mod.handles ? APP.mod.handles() : []).some(hd => Math.hypot(hd.x - p.x, hd.y - p.y) < 28);
+      c.style.cursor = near ? 'grab' : 'crosshair';
+      return;
+    }
+    ptrs.set(e.pointerId, p);
+    if (!drag) return;
+    if (drag.kind === 'h') { drag.moved += 1; drag.h.drag(p.x, p.y); }
+    else if (drag.kind === 'pan') {
+      const v = APP.mod.view;
+      v.cx -= (p.x - drag.last.x) / v.s; v.cy += (p.y - drag.last.y) / v.s;
+      drag.moved += Math.abs(p.x - drag.last.x) + Math.abs(p.y - drag.last.y);
+      drag.last = p; redraw();
+    } else if (drag.kind === 'pinch' && ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (drag.d0 > 0) zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / drag.d0);
+      drag.d0 = d;
+    }
+  });
+  const up = e => {
+    const p = pos(e);
+    if (drag && drag.kind === 'pan' && drag.moved < 6 && ptrs.size === 1 && APP.mod.tap) APP.mod.tap(p.x, p.y);
+    ptrs.delete(e.pointerId);
+    if (ptrs.size === 0) drag = null;
+    else if (ptrs.size === 1) { const q = [...ptrs.values()][0]; drag = { kind: 'pan', start: q, last: q, moved: 99 }; }
+  };
+  c.addEventListener('pointerup', up);
+  c.addEventListener('pointercancel', up);
+  c.addEventListener('wheel', e => { e.preventDefault(); const p = pos(e); zoomAt(p.x, p.y, e.deltaY < 0 ? 1.12 : 1 / 1.12); }, { passive: false });
+}
+function exportPNG() {
+  const sc = 3, W = CV.W, H = CV.H, capH = 64;
+  const c = document.createElement('canvas');
+  c.width = Math.round(W * sc); c.height = Math.round((H + capH) * sc);
+  const x = c.getContext('2d');
+  paint(x, W, H, sc);
+  x.setTransform(sc, 0, 0, sc, 0, 0);
+  x.fillStyle = '#fff'; x.fillRect(0, H, W, capH);
+  x.strokeStyle = '#d1d5db'; x.beginPath(); x.moveTo(0, H + .5); x.lineTo(W, H + .5); x.stroke();
+  x.fillStyle = '#111'; x.font = '600 17px system-ui,sans-serif'; x.textBaseline = 'alphabetic';
+  x.fillText(APP.mod.caption(), 14, H + 28);
+  x.font = '13px system-ui,sans-serif'; x.fillStyle = '#555';
+  x.fillText('Laboratorio Funzioni — ' + APP.mod.title + ' — ' + new Date().toLocaleDateString('it-IT'), 14, H + 50);
+  c.toBlob(b => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = 'funzioni-modulo' + (MODS.indexOf(APP.mod) + 1) + '.png';
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  }, 'image/png');
+}
+function refreshAll() { MODS.forEach(m => { if (m.root) m.update(); }); }
+window.addEventListener('DOMContentLoaded', () => {
+  CV.c = $('#cv'); CV.ctx = CV.c.getContext('2d');
+  const tabs = $('#tabs');
+  MODS.forEach((m, i) => tabs.append(h('button', { type: 'button', role: 'tab', onclick: () => selectTab(i) }, m.title)));
+  $('#bPredict').addEventListener('click', () => { APP.predict = !APP.predict; APP.revealed = false; syncPredict(); });
+  $('#bReveal').addEventListener('click', () => { APP.revealed = true; syncPredict(); });
+  $('#bNot').addEventListener('click', e => { APP.notation = APP.notation === 'ita' ? 'int' : 'ita'; e.target.textContent = APP.notation === 'ita' ? ']a;b[' : '(a;b)'; refreshAll(); });
+  const setFs = d => { APP.fs = clamp(APP.fs + d, 13, 26); document.documentElement.style.setProperty('--fs', APP.fs + 'px'); redraw(); };
+  $('#bFm').addEventListener('click', () => setFs(-1));
+  $('#bFp').addEventListener('click', () => setFs(1));
+  $('#bFull').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.(); });
+  $('#bReset').addEventListener('click', () => { const v = APP.mod.view; v.cx = 0; v.cy = 0; v.s = 0; redraw(); });
+  $('#bPng').addEventListener('click', exportPNG);
+  new ResizeObserver(resize).observe($('#right'));
+  initPointer();
+  selectTab(0);
+  resize();
+  if (!window.katex) $('#left').prepend(h('div', { class: 'msg warn', html: '<b>KaTeX non disponibile</b> (nessuna connessione a Internet): le formule sono mostrate in forma testuale LaTeX. Tutte le funzioni grafiche restano attive.' }));
+});
+</script>
+</body>
+</html>
